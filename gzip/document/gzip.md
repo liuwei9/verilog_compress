@@ -60,7 +60,9 @@ FPGA实现中一个很困难的点是如何快速的在缓存单元里面找到�
 
 使用的哈希函数如下：
 
-HASH<a, b, c> = (a << (HASH_BITS - 8)) ^ (a >> (HASH_BITS - 8) / 2) ^ a ^ (b<< (HASH_BITS - 8)) ^ (b>> (HASH_BITS - 8) / 2) ^ b ^ (c<< (HASH_BITS - 8)) ^ (c>> (HASH_BITS - 8) / 2) ^ c
+HASH<h, c> = (((h)<<H_SHIFT) ^ (c)) & HASH_MASK)
+
+其中H_SHIFT取5，HASH_MASK取32767，h指的是上一次算出来的HASH值，c指的是当前待编码元素，h的初始值为0，h取16bit
 
 其中HASH_BITS指的是HASH存储单元的地址大小，也就是缓存单元的大小，比如4k大小的缓存单元HASH_BITS就是12
 
