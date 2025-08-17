@@ -259,7 +259,7 @@ always @(posedge clk ) begin
         pipe_valid_1_t <= 1'b0;
     end
     else begin
-        if(pipe_last_0 & pipe_valid_0)begin
+        if(pipe_last_0[9] & pipe_valid_0[9])begin
             pipe_valid_1_t <= 1'b1;
         end
         else if(&dct_1d_cnt)begin
@@ -300,7 +300,7 @@ endgenerate
 
 generate
     for (i = 0; i < 8; i = i+1) begin: LOOP_DCT1D_P1_I
-        for (j = 1; j < 15; j = j+1) begin: LOOP_DCT1D_P1_J
+        for (j = 1; j < 16; j = j+1) begin: LOOP_DCT1D_P1_J
             always @(posedge clk ) begin
                 dct_1d_mem[i][j] <= dct_1d_mem[i][j - 1];
             end
@@ -313,28 +313,28 @@ generate
         always @(posedge clk ) begin
             case (dct_1d_cnt)
                 3'd0: begin
-                    dct_1d[i] <= dct_1d_mem[i][7 - i];
+                    dct_1d[i] <= dct_1d_mem[0][7 - i];
                 end 
                 3'd1: begin
-                    dct_1d[i] <= dct_1d_mem[i][8 - i];
+                    dct_1d[i] <= dct_1d_mem[1][8 - i];
                 end 
                 3'd2: begin
-                    dct_1d[i] <= dct_1d_mem[i][9 - i];
+                    dct_1d[i] <= dct_1d_mem[2][9 - i];
                 end 
                 3'd3: begin
-                    dct_1d[i] <= dct_1d_mem[i][10 - i];
+                    dct_1d[i] <= dct_1d_mem[3][10 - i];
                 end 
                 3'd4: begin
-                    dct_1d[i] <= dct_1d_mem[i][11 - i];
+                    dct_1d[i] <= dct_1d_mem[4][11 - i];
                 end 
                 3'd5: begin
-                    dct_1d[i] <= dct_1d_mem[i][12 - i];
+                    dct_1d[i] <= dct_1d_mem[5][12 - i];
                 end 
                 3'd6: begin
-                    dct_1d[i] <= dct_1d_mem[i][13 - i];
+                    dct_1d[i] <= dct_1d_mem[6][13 - i];
                 end 
                 3'd7: begin
-                    dct_1d[i] <= dct_1d_mem[i][14 - i];
+                    dct_1d[i] <= dct_1d_mem[7][14 - i];
                 end 
             endcase
         end
@@ -391,8 +391,8 @@ reg [23:0] pipe_60_6;
 reg [23:0] pipe_60_7;
 
 reg [25:0] pipe_70 [7:0];
-reg [10:0] pipe_valid_2;
-reg [10:0] pipe_last_2 ;
+reg [9:0]  pipe_valid_2;
+reg [9:0]  pipe_last_2 ;
 
 always @(posedge clk ) begin
     pipe_10[0] <= $signed(dct_1d[0]) + $signed(dct_1d[7]); //tmp0 = output(1, i) + output(8, i);
@@ -561,12 +561,12 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
-        pipe_valid_2 <= 11'd0;
-        pipe_last_2  <= 11'd0;
+        pipe_valid_2 <= 10'd0;
+        pipe_last_2  <= 10'd0;
     end
     else begin
-        pipe_valid_2 <= {pipe_valid_2[9:0], pipe_valid_1};
-        pipe_last_2  <= {pipe_last_2 [9:0], pipe_last_1 };
+        pipe_valid_2 <= {pipe_valid_2[8:0], pipe_valid_1};
+        pipe_last_2  <= {pipe_last_2 [8:0], pipe_last_1 };
     end
 end
 
@@ -583,7 +583,7 @@ reg pipe_valid_3;
 reg pipe_last_3 ;
 
 always @(posedge clk ) begin
-    if(pipe_valid_2)begin
+    if(pipe_valid_2[9])begin
         waddr <= waddr + 3'd1;
     end
     else begin
@@ -609,15 +609,10 @@ assign pipe_last_3_t = &raddr;
 
 always @(posedge clk ) begin
     if(pipe_valid_3_t)begin
-        raddr <= 6'd0;
+        raddr <= raddr + 6'd1;
     end
     else begin
-        if(pipe_valid_3_t)begin
-            raddr <= raddr + 6'd1;
-        end
-        else begin
-            raddr <= 6'd0;
-        end
+        raddr <= 6'd0;
     end
 end
 
@@ -669,46 +664,46 @@ always @(posedge clk ) begin
             dout_mem[25] <= pipe_70[1];
             dout_mem[26] <= pipe_70[2];
             dout_mem[27] <= pipe_70[3];
-            dout_mem[30] <= pipe_70[4];
-            dout_mem[31] <= pipe_70[5];
-            dout_mem[32] <= pipe_70[6];
-            dout_mem[33] <= pipe_70[7];
+            dout_mem[28] <= pipe_70[4];
+            dout_mem[29] <= pipe_70[5];
+            dout_mem[30] <= pipe_70[6];
+            dout_mem[31] <= pipe_70[7];
         end 
         3'd4: begin
-            dout_mem[24] <= pipe_70[0];
-            dout_mem[25] <= pipe_70[1];
-            dout_mem[26] <= pipe_70[2];
-            dout_mem[27] <= pipe_70[3];
-            dout_mem[30] <= pipe_70[4];
-            dout_mem[31] <= pipe_70[5];
-            dout_mem[32] <= pipe_70[6];
-            dout_mem[33] <= pipe_70[7];
+            dout_mem[32] <= pipe_70[0];
+            dout_mem[33] <= pipe_70[1];
+            dout_mem[34] <= pipe_70[2];
+            dout_mem[35] <= pipe_70[3];
+            dout_mem[36] <= pipe_70[4];
+            dout_mem[37] <= pipe_70[5];
+            dout_mem[38] <= pipe_70[6];
+            dout_mem[39] <= pipe_70[7];
         end 
         3'd5: begin
-            dout_mem[34] <= pipe_70[0];
-            dout_mem[35] <= pipe_70[1];
-            dout_mem[36] <= pipe_70[2];
-            dout_mem[37] <= pipe_70[3];
-            dout_mem[40] <= pipe_70[4];
-            dout_mem[41] <= pipe_70[5];
-            dout_mem[42] <= pipe_70[6];
-            dout_mem[43] <= pipe_70[7];
+            dout_mem[40] <= pipe_70[0];
+            dout_mem[41] <= pipe_70[1];
+            dout_mem[42] <= pipe_70[2];
+            dout_mem[43] <= pipe_70[3];
+            dout_mem[44] <= pipe_70[4];
+            dout_mem[45] <= pipe_70[5];
+            dout_mem[46] <= pipe_70[6];
+            dout_mem[47] <= pipe_70[7];
         end 
         3'd6: begin
-            dout_mem[44] <= pipe_70[0];
-            dout_mem[45] <= pipe_70[1];
-            dout_mem[46] <= pipe_70[2];
-            dout_mem[47] <= pipe_70[3];
-            dout_mem[50] <= pipe_70[4];
-            dout_mem[51] <= pipe_70[5];
-            dout_mem[52] <= pipe_70[6];
-            dout_mem[53] <= pipe_70[7];
+            dout_mem[48] <= pipe_70[0];
+            dout_mem[49] <= pipe_70[1];
+            dout_mem[50] <= pipe_70[2];
+            dout_mem[51] <= pipe_70[3];
+            dout_mem[52] <= pipe_70[4];
+            dout_mem[53] <= pipe_70[5];
+            dout_mem[54] <= pipe_70[6];
+            dout_mem[55] <= pipe_70[7];
         end 
         3'd7: begin
-            dout_mem[54] <= pipe_70[0];
-            dout_mem[55] <= pipe_70[1];
-            dout_mem[56] <= pipe_70[2];
-            dout_mem[57] <= pipe_70[3];
+            dout_mem[56] <= pipe_70[0];
+            dout_mem[57] <= pipe_70[1];
+            dout_mem[58] <= pipe_70[2];
+            dout_mem[59] <= pipe_70[3];
             dout_mem[60] <= pipe_70[4];
             dout_mem[61] <= pipe_70[5];
             dout_mem[62] <= pipe_70[6];
