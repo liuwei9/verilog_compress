@@ -72,7 +72,7 @@ reg [9:0] pipe_last_0 ;
 generate
     for (i = 0; i < 8; i = i + 1) begin : LOOP_MINUS_128
         always @(posedge clk ) begin
-            pipe_0[i] <= $signed({1'b0, s_data[i*8 +: 8]}) - $signed{1'b0, 8'd128};
+            pipe_0[i] <= $signed({1'b0, s_data[i*8 +: 8]}) - $signed({1'b0, 8'd128});
         end
     end
 endgenerate
@@ -256,22 +256,22 @@ reg pipe_valid_1;
 reg pipe_last_1 ;
 always @(posedge clk ) begin
     if(rst)begin
-        pipe_valid_1 <= 1'b0;
+        pipe_valid_1_t <= 1'b0;
     end
     else begin
         if(pipe_last_0 & pipe_valid_0)begin
-            pipe_valid_1 <= 1'b1;
+            pipe_valid_1_t <= 1'b1;
         end
         else if(&dct_1d_cnt)begin
-            pipe_valid_1 <= 1'b0;
+            pipe_valid_1_t <= 1'b0;
         end
     end
 end
 
-assign pipe_last_1 = &dct_1d_cnt;
+assign pipe_last_1_t = &dct_1d_cnt;
 
 always @(posedge clk ) begin
-    if(pipe_valid_1)begin
+    if(pipe_valid_1_t)begin
         dct_1d_cnt <= dct_1d_cnt + 3'd1;
     end
     else begin
@@ -300,7 +300,7 @@ endgenerate
 
 generate
     for (i = 0; i < 8; i = i+1) begin: LOOP_DCT1D_P1_I
-        for (j = 1; i < 15; j = j+1) begin: LOOP_DCT1D_P1_J
+        for (j = 1; j < 15; j = j+1) begin: LOOP_DCT1D_P1_J
             always @(posedge clk ) begin
                 dct_1d_mem[i][j] <= dct_1d_mem[i][j - 1];
             end
