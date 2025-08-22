@@ -5,11 +5,6 @@ module jpeg_in_buf #(
     input                           clk         ,
     input                           rst         ,
 
-    input [$clog2(IMG_H) - 1 : 0]   cfg_img_h   ,
-    input [$clog2(IMG_W) - 1 : 0]   cfg_img_w   ,
-    input [31:0]                    cfg_img_addr,
-    input                           jpeg_start  ,
-
     input [63:0]                    s_data      ,
     input [ 7:0]                    s_data_keep ,
     input                           s_data_valid,

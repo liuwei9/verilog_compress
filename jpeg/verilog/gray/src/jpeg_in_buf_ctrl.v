@@ -1,32 +1,56 @@
-module jpeg_in_buf #(
+module jpeg_in_buf_ctrl #(
     parameter IMG_H = 1024,
     parameter IMG_W = 8   
 ) (
-    input                           clk         ,
-    input                           rst         ,
+    input                           clk              ,
+    input                           rst              ,
 
-    input [$clog2(IMG_H) - 1 : 0]   cfg_img_h   ,
-    input [$clog2(IMG_W) - 1 : 0]   cfg_img_w   ,
-    input [31:0]                    cfg_img_addr,
-    input                           jpeg_start  ,
+    input [$clog2(IMG_H) - 1 : 0]   cfg_img_h        ,
+    input [$clog2(IMG_W) - 1 : 0]   cfg_img_w        ,
+    input [31:0]                    cfg_img_addr     ,
+    input                           jpeg_start       ,
 
-    input [63:0]                    s_data      ,
-    input [ 7:0]                    s_data_keep ,
-    input                           s_data_valid,
-    input                           s_data_last ,
-    output                          s_data_ready,
-    input                           s_data_done ,
+    input [63:0]                    s_data           ,
+    input [ 7:0]                    s_data_keep      ,
+    input                           s_data_valid     ,
+    input                           s_data_last      ,
+    output                          s_data_ready     ,
 
-    output [31:0]                   s_cmd_addr  ,
-    output [31:0]                   s_cmd_len   ,
-    output                          s_cmd_valid ,
-    input                           s_cmd_ready ,
+    output [31:0]                   s_cmd_addr       ,
+    output [31:0]                   s_cmd_len        ,
+    output                          s_cmd_valid      ,
+    input                           s_cmd_ready      ,
 
-    output [63:0]                   m_data      ,
-    output                          m_data_valid,
-    output                          m_data_last ,
-    input                           m_data_req  ,
-    output                          m_data_end  
+    output [63:0]                   m_data           ,
+    output                          m_data_valid     ,
+    output                          m_data_last      ,
+    input                           m_data_req       ,
+
+    output [63:0]                   ping_s_data      ,
+    output [ 7:0]                   ping_s_data_keep ,
+    output                          ping_s_data_valid,
+    output                          ping_s_data_last ,
+    input                           ping_s_data_ready,
+    output                          ping_s_data_done ,
+
+    output [63:0]                   pang_s_data      ,
+    output [ 7:0]                   pang_s_data_keep ,
+    output                          pang_s_data_valid,
+    output                          pang_s_data_last ,
+    input                           pang_s_data_ready,
+    output                          pang_s_data_done ,
+
+    input [63:0]                    ping_m_data      ,
+    input                           ping_m_data_valid,
+    input                           ping_m_data_last ,
+    output                          ping_m_data_req  ,
+    input                           ping_m_data_end  ,
+
+    input [63:0]                    pang_m_data      ,
+    input                           pang_m_data_valid,
+    input                           pang_m_data_last ,
+    output                          pang_m_data_req  ,
+    input                           pang_m_data_end  
 );
 
 localparam IMG_H_W = $clog2(IMG_H);
@@ -45,7 +69,8 @@ reg [31:0] s_cmd_addr_r ;
 reg [31:0] s_cmd_len_r  ;
 reg        s_cmd_valid_r;
 
-reg s_data_done_r;
+reg s_data_done;
+wire m_data_end;
 
 reg w_ping_t;
 reg w_ping;
@@ -142,14 +167,14 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
-        s_data_done_r <= 1'b0;
+        s_data_done <= 1'b0;
     end
     else begin
         if((curr_state == WAIT) && (next_state == IDLE))begin
-            s_data_done_r <= 1'b1;
+            s_data_done <= 1'b1;
         end
         else begin
-            s_data_done_r <= 1'b0;
+            s_data_done <= 1'b0;
         end
     end
 end
@@ -174,6 +199,38 @@ always @(posedge clk ) begin
     end
 end
 
+always @(posedge clk ) begin
+    if(rst)begin
+        r_ping <= 1'b0;
+    end
+    else begin
+        if(m_data_end)begin
+            r_ping <= !r_ping;
+        end
+    end
+end
 
+assign ping_s_data       = s_data     ;
+assign ping_s_data_keep  = s_data_keep;
+assign ping_s_data_valid = w_ping == 1'b0 ? s_data_valid : 1'b0;
+assign ping_s_data_last  = w_ping == 1'b0 ? s_data_last  : 1'b0;
+assign ping_s_data_done  = w_ping == 1'b0 ? s_data_done  : 1'b0;
+
+assign pang_s_data       = s_data     ;
+assign pang_s_data_keep  = s_data_keep;
+assign pang_s_data_valid = w_ping == 1'b1 ? s_data_valid : 1'b0;
+assign pang_s_data_last  = w_ping == 1'b1 ? s_data_last  : 1'b0;
+assign pang_s_data_done  = w_ping == 1'b1 ? s_data_done  : 1'b0;
+
+assign s_data_ready = w_ping == 1'b0 ? ping_s_data_ready : pang_s_data_ready;
+
+assign m_data       = r_ping == 1'b0 ? ping_m_data       : pang_m_data      ;
+assign m_data_valid = r_ping == 1'b0 ? ping_m_data_valid : pang_m_data_valid;
+assign m_data_last  = r_ping == 1'b0 ? ping_m_data_last  : pang_m_data_last ;
+
+assign ping_m_data_req = r_ping == 1'b0 ? m_data_req : 1'b0;
+assign pang_m_data_req = r_ping == 1'b1 ? m_data_req : 1'b0;
+
+assign m_data_end = ping_m_data_end | pang_m_data_end;
 
 endmodule
