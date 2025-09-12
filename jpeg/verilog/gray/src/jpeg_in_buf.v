@@ -66,11 +66,8 @@ always @(*) begin
                 next_state = WAIT;
             end
             else begin
-                next_state = WAIT;
+                next_state = WRITE;
             end
-        end
-        PADDING: begin
-            next_state = WAIT;
         end
         WAIT: begin
             if(m_data_req)begin
