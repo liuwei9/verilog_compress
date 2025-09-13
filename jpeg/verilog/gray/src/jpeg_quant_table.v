@@ -1,24 +1,21 @@
 module jpeg_quant_table #(
-    parameter QUANT_MEM_D    = 6400,
     parameter QUANT_LUM_PATH = ""  ,
     parameter DIV_LUM_PATH   = ""  
 ) (
-    input                                clk            ,
-    input                                jpeg_start     ,
+    input         clk            ,
+    input         jpeg_start     ,
 
-    input                                quant_lum_ren  ,
-    input  [$clog2(QUANT_MEM_D) - 1 : 0] quant_lum_raddr,
-    output [7:0]                         quant_lum_rdata,
+    input         quant_lum_ren  ,
+    input  [12:0] quant_lum_raddr,
+    output [7:0]  quant_lum_rdata,
 
-    input                                div_lum_ren    ,
-    input  [$clog2(QUANT_MEM_D) - 1 : 0] div_lum_raddr  ,
-    output [17:0]                        div_lum_rdata  
+    input         div_lum_ren    ,
+    input  [12:0] div_lum_raddr  ,
+    output [17:0] div_lum_rdata  
     
-
 );
-localparam MEM_DW = $clog2(QUANT_MEM_D);
-reg [ 7:0] quantLumMatrixMem [QUANT_MEM_D - 1:0];
-reg [17:0] divLumMatrixMem   [QUANT_MEM_D - 1:0];
+reg [ 7:0] quantLumMatrixMem [6399:0];
+reg [17:0] divLumMatrixMem   [6399:0];
 
 initial begin
     $readmemh(QUANT_LUM_PATH, quantLumMatrixMem);
