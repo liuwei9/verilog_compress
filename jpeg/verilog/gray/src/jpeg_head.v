@@ -16,7 +16,7 @@ module jpeg_head (
     output         jpeg_head_data_valid,
     output         jpeg_head_data_last  
 );
-localparam HEAD_CNT = 9'd25 + 9'd64 + 9'd239;
+localparam HEAD_CNT = 9'd25 + 9'd64 + 9'd239 + 9'd1;
 reg [8:0]  cnt  ;
 reg [8:0]  addr0;
 reg [12:0] addr1;
@@ -55,17 +55,17 @@ always @(posedge clk ) begin
         ren0 <= 1'b0;
     end
     else begin
-        if(jpeg_start)begin
+        if((cnt > 9'd0) && (cnt < 9'd26))begin
             ren0 <= 1'b1;
         end
-        else if(cnt == 9'd25)begin
+        else begin
             ren0 <= 1'b0;
         end
     end
 end
 
 always @(posedge clk ) begin
-    addr1 <= cnt - 9'd25 + ((cfg_quality - 7'd1) << 3'd6);
+    addr1 <= cnt - 9'd24 + ((cfg_quality - 7'd1) << 3'd6);
 end
 
 always @(posedge clk ) begin
@@ -73,7 +73,7 @@ always @(posedge clk ) begin
         ren1 <= 1'b0;
     end
     else begin
-        if((cnt > 9'd23) && (cnt < 9'd87))begin
+        if((cnt > 9'd23) && (cnt < 9'd88))begin
             ren1 <= 1'b1;
         end
         else begin
@@ -104,7 +104,7 @@ always @(posedge clk ) begin
         ren2 <= 1'b0;
     end
     else begin
-        if((cnt > 9'd88) && (cnt < HEAD_CNT))begin
+        if((cnt > 9'd89) && (cnt < HEAD_CNT))begin
             ren2 <= 1'b1;
         end
         else begin

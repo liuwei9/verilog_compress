@@ -37,6 +37,8 @@ always @(posedge clk ) begin
     quant_lum_rdata_t1 <= quant_lum_rdata_t0;
 end
 
+assign quant_lum_rdata = quant_lum_rdata_t1;
+
 always @(posedge clk ) begin
     if(quant_lum_ren)begin
         div_lum_rdata_t0 <= divLumMatrixMem[div_lum_raddr];
@@ -46,5 +48,7 @@ end
 always @(posedge clk ) begin
     div_lum_rdata_t1 <= div_lum_rdata_t0;
 end
+
+assign div_lum_rdata = div_lum_rdata_t1;
 
 endmodule
