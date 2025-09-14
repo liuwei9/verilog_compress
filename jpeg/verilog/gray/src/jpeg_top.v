@@ -17,10 +17,10 @@ module jpeg_top #(
     input          s_data_last      ,
     output         s_data_ready     ,
 
-    output [31:0]   s_cmd_addr       ,
-    output [31:0]   s_cmd_len        ,
-    output          s_cmd_valid      ,
-    input           s_cmd_ready      
+    output [31:0]  s_cmd_addr       ,
+    output [31:0]  s_cmd_len        ,
+    output         s_cmd_valid      ,
+    input          s_cmd_ready      
 );
 
 wire         quant_lum_ren       ;
@@ -43,6 +43,11 @@ wire        in_buf_m_data_req  ;
 wire [25:0] dct_m_data         ;
 wire        dct_m_data_valid   ;
 wire        dct_m_data_last    ;
+
+wire [63:0] ctrl_m_data        ;
+wire [ 7:0] ctrl_m_data_keep   ;
+wire        ctrl_m_data_valid  ;
+wire        ctrl_m_data_last   ;
 
 jpeg_head jpeg_head_inst(
     .clk                 (clk                 ),
@@ -120,6 +125,22 @@ jpeg_dct jpeg_dct_inst(
     .m_data           (dct_m_data      ),
     .m_data_valid     (dct_m_data_valid),
     .m_data_last      (dct_m_data_last ),
+);
+
+jpeg_ctrl jpeg_ctrl_inst(
+    .clk                  (clk                 ),
+    .rst                  (rst                 ),
+
+    .jpeg_start           (jpeg_start          ),
+
+    .jpeg_head_data       (jpeg_head_data      ),
+    .jpeg_head_data_valid (jpeg_head_data_valid),
+    .jpeg_head_data_last  (jpeg_head_data_last ),
+
+    .m_data               (ctrl_m_data         ),
+    .m_data_keep          (ctrl_m_data_keep    ),
+    .m_data_valid         (ctrl_m_data_valid   ),
+    .m_data_last          (ctrl_m_data_last    )
 );
     
 endmodule
