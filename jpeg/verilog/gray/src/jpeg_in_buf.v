@@ -52,10 +52,10 @@ reg        s_m_data_end  ;
 
 always @(posedge clk ) begin
     if(rst)begin
-        curr_state <= IDLE;
+        curr_state <= WRITE;
     end
     else begin
-        curr_state <= DATA;
+        curr_state <= next_state;
     end
 end
 
@@ -86,7 +86,7 @@ always @(*) begin
             end
         end
         default: begin
-            next_state = IDLE;
+            next_state = WRITE;
         end
     endcase
 end
@@ -134,21 +134,21 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
-        waddr <= {{DP_W}1'b0};
+        waddr <= {{DP_W}{1'b0}};
     end
     else begin
         if(s_data_valid & s_data_ready)begin
             waddr <= waddr + 1'b1;
         end
         else if(s_data_valid_ff & s_data_last_ff)begin
-            waddr <= {{DP_W}1'b0};
+            waddr <= {{DP_W}{1'b0}};
         end
     end
 end
 
 always @(posedge clk ) begin
     if(rst)begin
-        wlen <= {{DP_W}1'b0};
+        wlen <= {{DP_W}{1'b0}};
     end
     else if(s_data_valid_ff & s_data_last_ff)begin
         wlen <= waddr;
@@ -196,11 +196,11 @@ generate
     for (i = 0; i < 8; i = i+1) begin : LOOP_RADDR
         always @(posedge clk ) begin
             if(rst)begin
-                raddr[i] <= {{DP_W}1'b0};
+                raddr[i] <= {{DP_W}{1'b0}};
             end
             else begin
                 if(curr_state == WRITE)begin
-                    raddr[i] <= {{DP_W}1'b0};
+                    raddr[i] <= {{DP_W}{1'b0}};
                 end
                 else if(ren[i])begin
                     raddr[i] <= raddr[i] + 1'b1;

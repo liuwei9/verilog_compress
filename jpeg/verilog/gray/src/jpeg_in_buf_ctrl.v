@@ -156,7 +156,7 @@ end
 
 always @(posedge clk ) begin
     if(curr_state == IDLE)begin
-        row_cnt <= {{IMG_H_W}1'b0};
+        row_cnt <= {{IMG_H_W}{1'b0}};
     end
     else begin
         if((curr_state == DATA) && (next_state == WAIT))begin

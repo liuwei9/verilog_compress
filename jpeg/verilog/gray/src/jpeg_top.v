@@ -1,6 +1,8 @@
 module jpeg_top #(
-    parameter MAX_IMG_H = 1024,
-    parameter MAX_IMG_W = 8 
+    parameter MAX_IMG_H      = 1024,
+    parameter MAX_IMG_W      = 8   ,
+    parameter QUANT_LUM_PATH = ""  ,
+    parameter DIV_LUM_PATH   = ""  
 ) (
     input          clk              ,
     input          rst              ,
@@ -69,8 +71,8 @@ jpeg_head jpeg_head_inst(
 );
 
 jpeg_quant_table #(
-    .QUANT_LUM_PATH = (QUANT_LUM_PATH)  ,
-    .DIV_LUM_PATH   = (DIV_LUM_PATH  )  
+    .QUANT_LUM_PATH (QUANT_LUM_PATH ),
+    .DIV_LUM_PATH   (DIV_LUM_PATH   )  
 ) jpeg_quant_table_inst (
     .clk            (clk            ),
     .jpeg_start     (jpeg_start     ),
@@ -124,7 +126,7 @@ jpeg_dct jpeg_dct_inst(
 
     .m_data           (dct_m_data      ),
     .m_data_valid     (dct_m_data_valid),
-    .m_data_last      (dct_m_data_last ),
+    .m_data_last      (dct_m_data_last )
 );
 
 jpeg_ctrl jpeg_ctrl_inst(
