@@ -54,8 +54,8 @@ wire                          pang_m_data_req  ;
 wire                          pang_m_data_end  ;
 
 jpeg_in_buf_ctrl #(
-    .IMG_H (),
-    .IMG_W ()
+    .IMG_H (IMG_H),
+    .IMG_W (IMG_W)
 ) jpeg_in_buf_ctrl_inst (
     .clk               (clk              ),
     .rst               (rst              ),

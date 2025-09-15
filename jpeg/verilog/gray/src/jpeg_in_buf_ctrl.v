@@ -73,6 +73,7 @@ reg s_data_done;
 wire m_data_end;
 
 reg w_ping_t;
+reg w_ping_tt;
 reg w_ping;
 reg r_ping;
 
@@ -154,6 +155,10 @@ always @(posedge clk ) begin
     end
 end
 
+assign s_cmd_addr  = s_cmd_addr_r ;
+assign s_cmd_len   = s_cmd_len_r  ;
+assign s_cmd_valid = s_cmd_valid_r;
+
 always @(posedge clk ) begin
     if(curr_state == IDLE)begin
         row_cnt <= {{IMG_H_W}{1'b0}};
@@ -184,7 +189,7 @@ always @(posedge clk ) begin
         w_ping_t <= 1'b0;
     end
     else begin
-        if((curr_state == WAIT) && (next_state != WAIT))begin
+        if((curr_state == DATA) && (next_state == WAIT) && (&row_cnt[2:0]))begin
             w_ping_t <= !w_ping_t;
         end
     end
@@ -192,10 +197,12 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
-        w_ping <= 1'b0;
+        w_ping_tt <= 1'b0;
+        w_ping    <= 1'b0;
     end
     else begin
-        w_ping_t <= w_ping;
+        w_ping_tt <= w_ping_t ;
+        w_ping    <= w_ping_tt;
     end
 end
 

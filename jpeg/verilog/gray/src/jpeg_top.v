@@ -46,6 +46,10 @@ wire [25:0] dct_m_data         ;
 wire        dct_m_data_valid   ;
 wire        dct_m_data_last    ;
 
+wire [19:0] quant_m_data       ;
+wire        quant_m_data_valid ;
+wire        quant_m_data_last  ;
+
 wire [63:0] ctrl_m_data        ;
 wire [ 7:0] ctrl_m_data_keep   ;
 wire        ctrl_m_data_valid  ;
@@ -116,6 +120,8 @@ jpeg_in_buf_top #(
     .m_data_req       (in_buf_m_data_req  )
 );
 
+assign in_buf_m_data_req = 1'b1;
+
 jpeg_dct jpeg_dct_inst(
     .clk              (clk              ),
     .rst              (rst              ),
@@ -127,6 +133,26 @@ jpeg_dct jpeg_dct_inst(
     .m_data           (dct_m_data      ),
     .m_data_valid     (dct_m_data_valid),
     .m_data_last      (dct_m_data_last )
+);
+
+jpeg_quant jpeg_quant_inst(
+    .clk              (clk                ),
+    .rst              (rst                ),
+
+    .cfg_quality      (cfg_quality        ), 
+    .jpeg_start       (jpeg_start         ),
+
+    .s_data           (dct_m_data         ),
+    .s_data_valid     (dct_m_data_valid   ),
+    .s_data_last      (dct_m_data_last    ),
+
+    .div_lum_ren      (div_lum_ren        ),
+    .div_lum_raddr    (div_lum_raddr      ),
+    .div_lum_rdata    (div_lum_rdata      ),
+    
+    .m_data           (quant_m_data       ),
+    .m_data_valid     (quant_m_data_valid ),
+    .m_data_last      (quant_m_data_last  )
 );
 
 jpeg_ctrl jpeg_ctrl_inst(
