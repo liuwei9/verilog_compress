@@ -632,82 +632,82 @@ always @(posedge clk ) begin
         case (waddr)
             3'd0: begin
                 dout_mem[0] <= pipe_70[0];
-                dout_mem[1] <= pipe_70[1];
-                dout_mem[2] <= pipe_70[2];
-                dout_mem[3] <= pipe_70[3];
-                dout_mem[4] <= pipe_70[4];
-                dout_mem[5] <= pipe_70[5];
-                dout_mem[6] <= pipe_70[6];
-                dout_mem[7] <= pipe_70[7];
+                dout_mem[2] <= pipe_70[1];
+                dout_mem[3] <= pipe_70[2];
+                dout_mem[9] <= pipe_70[3];
+                dout_mem[10] <= pipe_70[4];
+                dout_mem[20] <= pipe_70[5];
+                dout_mem[21] <= pipe_70[6];
+                dout_mem[35] <= pipe_70[7];
             end 
             3'd1: begin
-                dout_mem[8] <= pipe_70[0];
-                dout_mem[9] <= pipe_70[1];
-                dout_mem[10] <= pipe_70[2];
+                dout_mem[1] <= pipe_70[0];
+                dout_mem[4] <= pipe_70[1];
+                dout_mem[8] <= pipe_70[2];
                 dout_mem[11] <= pipe_70[3];
-                dout_mem[12] <= pipe_70[4];
-                dout_mem[13] <= pipe_70[5];
-                dout_mem[14] <= pipe_70[6];
-                dout_mem[15] <= pipe_70[7];
+                dout_mem[19] <= pipe_70[4];
+                dout_mem[22] <= pipe_70[5];
+                dout_mem[34] <= pipe_70[6];
+                dout_mem[36] <= pipe_70[7];
             end 
             3'd2: begin
-                dout_mem[16] <= pipe_70[0];
-                dout_mem[17] <= pipe_70[1];
-                dout_mem[18] <= pipe_70[2];
-                dout_mem[19] <= pipe_70[3];
-                dout_mem[20] <= pipe_70[4];
-                dout_mem[21] <= pipe_70[5];
-                dout_mem[22] <= pipe_70[6];
-                dout_mem[23] <= pipe_70[7];
+                dout_mem[5] <= pipe_70[0];
+                dout_mem[7] <= pipe_70[1];
+                dout_mem[12] <= pipe_70[2];
+                dout_mem[18] <= pipe_70[3];
+                dout_mem[23] <= pipe_70[4];
+                dout_mem[33] <= pipe_70[5];
+                dout_mem[37] <= pipe_70[6];
+                dout_mem[48] <= pipe_70[7];
             end 
             3'd3: begin
-                dout_mem[24] <= pipe_70[0];
-                dout_mem[25] <= pipe_70[1];
-                dout_mem[26] <= pipe_70[2];
-                dout_mem[27] <= pipe_70[3];
-                dout_mem[28] <= pipe_70[4];
-                dout_mem[29] <= pipe_70[5];
-                dout_mem[30] <= pipe_70[6];
-                dout_mem[31] <= pipe_70[7];
+                dout_mem[6] <= pipe_70[0];
+                dout_mem[13] <= pipe_70[1];
+                dout_mem[17] <= pipe_70[2];
+                dout_mem[24] <= pipe_70[3];
+                dout_mem[32] <= pipe_70[4];
+                dout_mem[38] <= pipe_70[5];
+                dout_mem[47] <= pipe_70[6];
+                dout_mem[49] <= pipe_70[7];
             end 
             3'd4: begin
-                dout_mem[32] <= pipe_70[0];
-                dout_mem[33] <= pipe_70[1];
-                dout_mem[34] <= pipe_70[2];
-                dout_mem[35] <= pipe_70[3];
-                dout_mem[36] <= pipe_70[4];
-                dout_mem[37] <= pipe_70[5];
-                dout_mem[38] <= pipe_70[6];
-                dout_mem[39] <= pipe_70[7];
+                dout_mem[14] <= pipe_70[0];
+                dout_mem[16] <= pipe_70[1];
+                dout_mem[25] <= pipe_70[2];
+                dout_mem[31] <= pipe_70[3];
+                dout_mem[39] <= pipe_70[4];
+                dout_mem[46] <= pipe_70[5];
+                dout_mem[50] <= pipe_70[6];
+                dout_mem[57] <= pipe_70[7];
             end 
             3'd5: begin
-                dout_mem[40] <= pipe_70[0];
-                dout_mem[41] <= pipe_70[1];
-                dout_mem[42] <= pipe_70[2];
-                dout_mem[43] <= pipe_70[3];
-                dout_mem[44] <= pipe_70[4];
-                dout_mem[45] <= pipe_70[5];
-                dout_mem[46] <= pipe_70[6];
-                dout_mem[47] <= pipe_70[7];
+                dout_mem[15] <= pipe_70[0];
+                dout_mem[26] <= pipe_70[1];
+                dout_mem[30] <= pipe_70[2];
+                dout_mem[40] <= pipe_70[3];
+                dout_mem[45] <= pipe_70[4];
+                dout_mem[51] <= pipe_70[5];
+                dout_mem[56] <= pipe_70[6];
+                dout_mem[58] <= pipe_70[7];
             end 
             3'd6: begin
-                dout_mem[48] <= pipe_70[0];
-                dout_mem[49] <= pipe_70[1];
-                dout_mem[50] <= pipe_70[2];
-                dout_mem[51] <= pipe_70[3];
+                dout_mem[27] <= pipe_70[0];
+                dout_mem[29] <= pipe_70[1];
+                dout_mem[41] <= pipe_70[2];
+                dout_mem[44] <= pipe_70[3];
                 dout_mem[52] <= pipe_70[4];
-                dout_mem[53] <= pipe_70[5];
-                dout_mem[54] <= pipe_70[6];
-                dout_mem[55] <= pipe_70[7];
+                dout_mem[55] <= pipe_70[5];
+                dout_mem[59] <= pipe_70[6];
+                dout_mem[62] <= pipe_70[7];
             end 
             3'd7: begin
-                dout_mem[56] <= pipe_70[0];
-                dout_mem[57] <= pipe_70[1];
-                dout_mem[58] <= pipe_70[2];
-                dout_mem[59] <= pipe_70[3];
-                dout_mem[60] <= pipe_70[4];
-                dout_mem[61] <= pipe_70[5];
-                dout_mem[62] <= pipe_70[6];
+                dout_mem[28] <= pipe_70[0];
+                dout_mem[42] <= pipe_70[1];
+                dout_mem[43] <= pipe_70[2];
+                dout_mem[53] <= pipe_70[3];
+                dout_mem[54] <= pipe_70[4];
+                dout_mem[60] <= pipe_70[5];
+                dout_mem[61] <= pipe_70[6];
                 dout_mem[63] <= pipe_70[7];
             end  
         endcase
