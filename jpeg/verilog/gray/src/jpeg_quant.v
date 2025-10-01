@@ -13,7 +13,8 @@ module jpeg_quant (
     output [12:0]  div_lum_raddr    ,
     input  [17:0]  div_lum_rdata    ,
     
-    output [19:0]  m_data           ,
+    output [11:0]  m_data           ,
+    output [5:0]   m_zero_cnt       ,
     output         m_data_valid     ,
     output         m_data_last      
 );
@@ -28,8 +29,14 @@ reg [17:0] div_lum_rdata_ff [1:0];
 reg [43:0] mul_data;
 reg [19:0] round_data;
 
-reg [5:0] s_data_valid_ff;
-reg [5:0] s_data_last_ff ;
+reg [6:0] s_data_valid_ff;
+reg [6:0] s_data_last_ff ;
+
+reg [5:0]  zero_cnt;
+reg [5:0]  zero_cnt_ff;
+reg [11:0] round_data_ff;
+reg        valid;
+reg        valid_zero_last;
 
 always @(posedge clk ) begin
     if(rst)begin
@@ -80,17 +87,56 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
-        s_data_valid_ff <= 6'd0;
-        s_data_last_ff  <= 6'd0;
+        s_data_valid_ff <= 7'd0;
+        s_data_last_ff  <= 7'd0;
     end
     else begin
-        s_data_valid_ff <= {s_data_valid_ff[4:0], s_data_valid};
-        s_data_last_ff  <= {s_data_last_ff [4:0], s_data_last };
+        s_data_valid_ff <= {s_data_valid_ff[5:0], s_data_valid};
+        s_data_last_ff  <= {s_data_last_ff [5:0], s_data_last };
     end
 end
 
-assign m_data = round_data;
-assign m_data_valid = s_data_valid_ff[5];
-assign m_data_last  = s_data_last_ff [5];
+always @(posedge clk ) begin
+    if(rst)begin
+        zero_cnt <= 6'd0;
+    end
+    else begin
+        if(s_data_valid_ff[5] & (~s_data_valid_ff[6]))begin
+            if(round_data[11:0] == 12'd0)begin
+                zero_cnt <= zero_cnt + 6'd1;
+            end
+            else begin
+                zero_cnt <= 6'd0;
+            end
+        end
+        else begin
+            zero_cnt <= 6'd0;
+        end
+    end
+end 
+
+always @(posedge clk ) begin
+    zero_cnt_ff <= zero_cnt;
+end
+
+always @(posedge clk ) begin
+    round_data_ff <= round_data[11:0];
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        valid <= 1'b0;
+        valid_zero_last <= 1'b0;
+    end
+    else begin
+        valid <= (s_data_valid_ff[5] & ((!s_data_valid_ff[6]) || (round_data[11:0] != 12'd0)) || (s_data_last_ff[5])); 
+        valid_zero_last <= s_data_valid_ff[5] & (round_data[11:0] == 12'd0) & s_data_last_ff[5];
+    end
+end
+
+assign m_data       = round_data_ff     ;
+assign m_zero_cnt   = valid_zero_last ? zero_cnt : zero_cnt_ff;
+assign m_data_valid = valid             ;
+assign m_data_last  = s_data_last_ff [6];
     
 endmodule
