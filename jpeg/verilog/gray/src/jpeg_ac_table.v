@@ -1,10 +1,10 @@
-module jpeg_dc_table (
-    input         clk     ,
-    input         rst     ,
+module jpeg_ac_table (
+    input             clk     ,
+    input             rst     ,
 
-    input  [7:0]  ac_raddr,
-    output [4:0]  ac_len  ,
-    output [15:0] ac_code  
+    input      [7:0]  ac_raddr,
+    output reg [4:0]  ac_len  ,
+    output reg [15:0] ac_code  
 );
 
 always @(posedge clk ) begin

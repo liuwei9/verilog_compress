@@ -46,9 +46,25 @@ wire [25:0] dct_m_data         ;
 wire        dct_m_data_valid   ;
 wire        dct_m_data_last    ;
 
-wire [19:0] quant_m_data       ;
+wire [11:0] quant_m_data       ;
+wire [5:0]  quant_m_zero_cnt   ;
 wire        quant_m_data_valid ;
 wire        quant_m_data_last  ;
+
+wire [7:0]  ac_raddr;
+wire [4:0]  ac_len  ;
+wire [15:0] ac_code ;
+
+wire [3:0]  dc_raddr;
+wire [3:0]  dc_len  ;
+wire [8:0]  dc_code ;
+
+wire [4:0]  huffman_m_len       ;
+wire [15:0] huffman_m_code      ;
+wire [3:0]  huffman_m_bits      ;
+wire [11:0] huffman_m_data      ;
+wire        huffman_m_data_valid;
+wire        huffman_m_data_last ;
 
 wire [63:0] ctrl_m_data        ;
 wire [ 7:0] ctrl_m_data_keep   ;
@@ -151,8 +167,54 @@ jpeg_quant jpeg_quant_inst(
     .div_lum_rdata    (div_lum_rdata      ),
     
     .m_data           (quant_m_data       ),
+    .m_zero_cnt       (quant_m_zero_cnt   ),
     .m_data_valid     (quant_m_data_valid ),
     .m_data_last      (quant_m_data_last  )
+);
+
+jpeg_huffman jpeg_huffman_inst(
+    .clk              (clk              ),
+    .rst              (rst              ),
+
+    .jpeg_start       (jpeg_start       ),
+
+    .s_data           (quant_m_data      ),
+    .s_zero_cnt       (quant_m_zero_cnt  ),
+    .s_data_valid     (quant_m_data_valid),
+    .s_data_last      (quant_m_data_last ),
+
+    .dc_raddr         (dc_raddr         ),
+    .ac_raddr         (ac_raddr         ),
+
+    .ac_len           (ac_len           ),
+    .ac_code          (ac_code          ),
+    .dc_len           (dc_len           ),
+    .dc_code          (dc_code          ),
+
+    .m_len            (huffman_m_len       ),
+    .m_code           (huffman_m_code      ),
+    .m_bits           (huffman_m_bits      ),
+    .m_data           (huffman_m_data      ),
+    .m_data_valid     (huffman_m_data_valid),
+    .m_data_last      (huffman_m_data_last ) 
+);
+
+jpeg_dc_table jpeg_dc_table_inst(
+    .clk      (clk     ),
+    .rst      (rst     ),
+    
+    .dc_raddr (dc_raddr),
+    .dc_len   (dc_len  ),
+    .dc_code  (dc_code ) 
+);
+
+jpeg_ac_table jpeg_ac_table_inst(
+    .clk      (clk     ),
+    .rst      (rst     ),
+
+    .ac_raddr (ac_raddr),
+    .ac_len   (ac_len  ),
+    .ac_code  (ac_code ) 
 );
 
 jpeg_ctrl jpeg_ctrl_inst(
