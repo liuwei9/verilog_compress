@@ -227,6 +227,13 @@ jpeg_ctrl jpeg_ctrl_inst(
     .jpeg_head_data_valid (jpeg_head_data_valid),
     .jpeg_head_data_last  (jpeg_head_data_last ),
 
+    .huffman_s_len        (huffman_m_len       ),
+    .huffman_s_code       (huffman_m_code      ),
+    .huffman_s_bits       (huffman_m_bits      ),
+    .huffman_s_data       (huffman_m_data      ),
+    .huffman_s_data_valid (huffman_m_data_valid),
+    .huffman_s_data_last  (huffman_m_data_last ),
+
     .m_data               (ctrl_m_data         ),
     .m_data_keep          (ctrl_m_data_keep    ),
     .m_data_valid         (ctrl_m_data_valid   ),

@@ -8,6 +8,13 @@ module jpeg_ctrl (
     input          jpeg_head_data_valid,
     input          jpeg_head_data_last ,
 
+    input [4:0]    huffman_s_len       ,
+    input [15:0]   huffman_s_code      ,
+    input [3:0]    huffman_s_bits      ,
+    input [11:0]   huffman_s_data      ,
+    input          huffman_s_data_valid,
+    input          huffman_s_data_last ,
+
     output [63:0]  m_data              ,
     output [ 7:0]  m_data_keep         ,
     output         m_data_valid        ,
@@ -26,6 +33,9 @@ reg [2:0]  head_cnt  ;
 reg [63:0] head_data ;
 reg        head_valid;
 reg        head_last ;
+
+reg [27:0] huffman_data_temp;
+reg [4:0]  huffman_data_temp_bits;
 
 always @(posedge clk ) begin
     if(rst)begin
@@ -93,6 +103,11 @@ always @(posedge clk ) begin
         head_valid <= jpeg_head_data_valid & (&head_cnt);
         head_last  <= jpeg_head_data_last;
     end
+end
+
+always @(posedge clk ) begin
+    huffman_data_temp_bits <= huffman_s_len + huffman_s_bits;
+    huffman_data_temp <= (huffman_s_code << huffman_s_bits) | huffman_s_data;
 end
 
 assign m_data       = head_valid ? head_data : 64'd0;
