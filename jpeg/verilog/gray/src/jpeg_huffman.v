@@ -72,6 +72,9 @@ always @(posedge clk ) begin
         if(fifo_m_ready & fifo_m_valid & (!t_data_last) & (t_zero_cnt > 6'd16))begin
             calc_state <= 1'b1;
         end
+        else if(zero_cnt == 5'd0)begin
+            calc_state <= 1'b0;
+        end
     end
 end
 
@@ -113,6 +116,18 @@ always @(posedge clk ) begin
         first_flag_ff <= {first_flag_ff[5:0], first_flag};
         t_valid_ff    <= {t_valid_ff[5:0], fifo_m_valid & fifo_m_ready};
         t_last_ff     <= {t_last_ff[5:0], t_data_last};
+    end
+end
+
+always @(posedge clk ) begin
+    if(fifo_m_valid & fifo_m_ready)begin
+        zero_cnt <= t_zero_cnt;
+    end
+    else if(zero_cnt >= 5'd16)begin
+        zero_cnt <= zero_cnt - 5'd16;
+    end
+    else if(zero_cnt > 5'd0)begin
+        zero_cnt <= 5'd0;
     end
 end
 
