@@ -8,6 +8,8 @@ parameter MAX_IMG_H      = 720 ;
 parameter MAX_IMG_W      = 1280;
 parameter QUANT_LUM_PATH = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/quantLumMatrix.mem";
 parameter DIV_LUM_PATH   = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/divLumMatrix.mem"  ;
+parameter IMG_FILE_PATH  = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_img.txt";
+parameter IMG_FILE_LEN   = 921600;
 
 wire [15:0]   cfg_img_h    = 720  ;
 wire [15:0]   cfg_img_w    = 1280 ;
@@ -70,6 +72,38 @@ jpeg_top #(
     .s_cmd_len        (s_cmd_len        ),
     .s_cmd_valid      (s_cmd_valid      ),
     .s_cmd_ready      (s_cmd_ready      )
+);
+
+tb_read_data #(
+    .FILE_PATH (IMG_FILE_PATH),
+    .FILE_LEN  (IMG_FILE_LEN ) 
+) tb_read_data_inst (
+    .clk          (clk              ),
+    .rst          (rst              ),
+    .start        (jpeg_start       ),
+
+    .cmd_addr     (s_cmd_addr       ),
+    .cmd_len      (s_cmd_len        ),
+    .cmd_valid    (s_cmd_valid      ),
+    .cmd_ready    (s_cmd_ready      ),
+
+    .data         (s_data           ),
+    .data_keep    (s_data_keep      ),
+    .data_valid   (s_data_valid     ),
+    .data_last    (s_data_last      ),
+    .data_ready   (s_data_ready     )  
+);
+
+tb_save #(
+    .FILE_PATH (DUT_FILE_PATH)
+) tb_save_inst (
+    .clk          (clk          ),
+    .rst          (rst          ),
+    .calc_last    (),
+    .m_data       (),
+    .m_data_valid (),
+    .m_data_last  (),
+    .m_data_ready ()
 );
 
 endmodule
