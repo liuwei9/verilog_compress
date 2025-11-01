@@ -101,7 +101,7 @@ always @(posedge clk ) begin
         zero_cnt <= 6'd0;
     end
     else begin
-        if(s_data_valid_ff[5] & (~s_data_valid_ff[6]))begin
+        if(s_data_valid_ff[5] & (s_data_valid_ff[6]))begin
             if(round_data[11:0] == 12'd0)begin
                 zero_cnt <= zero_cnt + 6'd1;
             end

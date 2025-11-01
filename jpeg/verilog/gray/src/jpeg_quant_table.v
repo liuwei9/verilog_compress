@@ -40,7 +40,7 @@ end
 assign quant_lum_rdata = quant_lum_rdata_t1;
 
 always @(posedge clk ) begin
-    if(quant_lum_ren)begin
+    if(div_lum_ren)begin
         div_lum_rdata_t0 <= divLumMatrixMem[div_lum_raddr];
     end
 end
