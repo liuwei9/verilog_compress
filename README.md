@@ -1,7 +1,7 @@
 # 压缩算法
 
 - [ ] gzip
-
+- [ ] JPEG
 - [ ] JPEG LS
 - [ ] JPEG 2000
 
