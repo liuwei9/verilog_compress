@@ -43,6 +43,8 @@ reg first_flag;
 reg [6:0] first_flag_ff;
 reg [6:0] t_valid_ff;
 reg [6:0] t_last_ff ;
+reg       last_flag;
+reg       last_data;
 
 reg [11:0] pipe_1;
 reg [11:0] pipe_2_0;
@@ -58,7 +60,8 @@ reg        zero_valid;
 reg [3:0]  zero_valid_ff;
 reg [3:0]  n_bits_ff [1:0];
 reg [1:0]  zero_state; //00->zero<16, 01->zero>=16, 10->last&zero>0&data==0, 
-reg [1:0]  zero_state_ff [1:0];
+reg [1:0]  zero_state_ff [3:0];
+reg        zero_16;
 
 assign fifo_m_ready = !calc_state;
 assign fifo_s_data  = {s_data, s_zero_cnt, s_data_last};
@@ -72,7 +75,7 @@ always @(posedge clk ) begin
         calc_state <= 1'b0;
     end
     else begin
-        if(fifo_m_ready & fifo_m_valid & (!t_data_last) & (t_zero_cnt > 6'd16))begin
+        if((fifo_m_ready & fifo_m_valid) && ((t_zero_cnt == 6'd16) && (t_data != 12'd0)) || ((!t_data_last) & (t_zero_cnt > 6'd16)))begin
             calc_state <= 1'b1;
         end
         else if(zero_cnt == 5'd0)begin
@@ -118,7 +121,7 @@ always @(posedge clk ) begin
     else begin
         first_flag_ff <= {first_flag_ff[5:0], first_flag};
         t_valid_ff    <= {t_valid_ff[5:0], fifo_m_valid & fifo_m_ready};
-        t_last_ff     <= {t_last_ff[5:0], t_data_last};
+        t_last_ff     <= {t_last_ff[5:0], last_data};
     end
 end
 
@@ -141,10 +144,57 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
+        last_flag <= 1'b0;
+    end
+    else begin
+        if(fifo_m_valid & fifo_m_ready & t_data_last & (t_data != 12'd0) & (t_zero_cnt >= 6'd16))begin
+            last_flag <= 1'b1;
+        end
+        else if(last_data)begin
+            last_flag <= 1'b0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        last_data <= 1'b0;
+    end
+    else begin
+        if(fifo_m_valid & fifo_m_ready)begin
+            if(t_data_last & ((t_data == 12'd0) || (t_zero_cnt < 6'd16)))begin
+                last_data <= 1'b1;
+            end
+        end
+        else if(last_flag & (zero_cnt < 6'd32))begin
+            last_data <= 1'b1;
+        end
+        else begin
+            last_data <= 1'b0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        zero_16 <= 1'b0;
+    end
+    else begin
+        if(fifo_m_valid & fifo_m_ready & (t_data != 12'd0) & (t_zero_cnt == 6'd16))begin
+            zero_16 <= 1'b1;
+        end
+        else begin
+            zero_16 <= 1'b0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
         zero_valid <= 1'b0;
     end
     else begin
-        zero_valid <= (fifo_m_valid & fifo_m_ready & (!first_flag)) | (zero_cnt > 6'd16);
+        zero_valid <= (fifo_m_valid & fifo_m_ready & (!first_flag)) | (zero_cnt > 6'd16) | zero_16;
     end
 end
 
@@ -185,6 +235,8 @@ end
 always @(posedge clk ) begin
     zero_state_ff[0] <= zero_state;
     zero_state_ff[1] <= zero_state_ff[0];
+    zero_state_ff[2] <= zero_state_ff[1];
+    zero_state_ff[3] <= zero_state_ff[2];
 end
 
 always @(posedge clk ) begin
@@ -287,9 +339,10 @@ end
 
 assign m_len  = first_flag_ff[4] ? {1'b0, dc_len }: ac_len ;
 assign m_code = first_flag_ff[4] ? {4'b0, dc_code}: ac_code;
-assign m_bits = n_bits_ff[1];
-assign m_data = pipe_2_1_ff[2];
+assign m_bits = zero_state_ff[3] == 2'b00 ? n_bits_ff[1]   :  4'd0;
+assign m_data = zero_state_ff[3] == 2'b00 ? pipe_2_1_ff[2] : 12'd0;
 assign m_data_valid = (t_valid_ff[4] & first_flag_ff[4]) | zero_valid_ff[3];
+assign m_data_last  = t_last_ff[3];
 
 assign dc_raddr = s_dc_raddr;
 assign ac_raddr = s_ac_raddr;
