@@ -131,11 +131,11 @@ always @(posedge clk ) begin
             zero_cnt <= t_zero_cnt;
         end       
     end
-    else if(zero_cnt >= 5'd16)begin
-        zero_cnt <= zero_cnt - 5'd16;
+    else if(zero_cnt >= 6'd16)begin
+        zero_cnt <= zero_cnt - 6'd16;
     end
-    else if(zero_cnt > 5'd0)begin
-        zero_cnt <= 5'd0;
+    else if(zero_cnt > 6'd0)begin
+        zero_cnt <= 6'd0;
     end
 end
 
@@ -144,7 +144,7 @@ always @(posedge clk ) begin
         zero_valid <= 1'b0;
     end
     else begin
-        zero_valid <= (fifo_m_valid & fifo_m_ready & (!first_flag)) | (zero_cnt > 5'd16);
+        zero_valid <= (fifo_m_valid & fifo_m_ready & (!first_flag)) | (zero_cnt > 6'd16);
     end
 end
 
@@ -167,14 +167,14 @@ always @(posedge clk ) begin
         if(t_data_last && (t_data == 12'd0))begin
             zero_state <= 2'b10;
         end
-        else if(t_zero_cnt >= 5'd16)begin
+        else if(t_zero_cnt >= 6'd16)begin
             zero_state <= 2'b01;
         end
         else begin
             zero_state <= 2'b00;
         end
     end
-    else if(zero_cnt >= 5'd16)begin
+    else if(zero_cnt >= 6'd32)begin
         zero_state <= 2'b01;
     end
     else begin
