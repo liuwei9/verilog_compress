@@ -107,7 +107,7 @@ end
 
 always @(posedge clk ) begin
     huffman_data_temp_bits <= huffman_s_len + huffman_s_bits;
-    huffman_data_temp <= (huffman_s_code << huffman_s_bits) | huffman_s_data;
+    huffman_data_temp <= (huffman_s_data << huffman_s_len) | huffman_s_code;
 end
 
 assign m_data       = head_valid ? head_data : 64'd0;
