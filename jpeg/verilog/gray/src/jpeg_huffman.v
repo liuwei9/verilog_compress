@@ -265,7 +265,7 @@ end
 always @(posedge clk ) begin
     pipe_2_1_ff[0] <= pipe_2_1      ;
     pipe_2_1_ff[1] <= pipe_2_1_ff[0];
-    pipe_2_1_ff[2] <= pipe_2_1_ff[1];
+    pipe_2_1_ff[2] <= pipe_2_1_ff[1] & ({12{1'b1}} >> (4'd12 - n_bits_ff[0]));
 end
 
 always @(posedge clk ) begin
