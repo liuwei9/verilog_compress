@@ -21,7 +21,9 @@ module jpeg_in_buf #(
 
 genvar i;
 
-localparam DP_W = $clog2(IMG_W);
+localparam DP = (IMG_W + 7) / 8;
+
+localparam DP_W = $clog2(DP);
 
 localparam WRITE   = 3'b001;
 localparam WAIT    = 3'b010;
@@ -238,7 +240,7 @@ assign m_data_end   = s_m_data_end  ;
 generate
     for (i = 0; i < 8; i = i+1) begin : LOOP_MEM
         spram #(
-            .DP (IMG_W),
+            .DP (DP),
             .DW (64) 
         ) spram_inst (
             .clk   (clk     ),
