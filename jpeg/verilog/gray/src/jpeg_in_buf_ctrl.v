@@ -24,6 +24,7 @@ module jpeg_in_buf_ctrl #(
     output [63:0]                   m_data           ,
     output                          m_data_valid     ,
     output                          m_data_last      ,
+    output                          m_frame_end      ,
     input                           m_data_req       ,
 
     output [63:0]                   ping_s_data      ,
@@ -64,6 +65,9 @@ reg [3:0] curr_state;
 reg [3:0] next_state;
 
 reg [IMG_H_W - 1 : 0] row_cnt;
+reg [IMG_H_W - 1 : 0] m_row_num;
+reg [IMG_H_W - 1 : 0] m_row_cnt;
+reg                   m_frame_end_r;
 
 reg [31:0] s_cmd_addr_r ;
 reg [31:0] s_cmd_len_r  ;
@@ -239,5 +243,39 @@ assign ping_m_data_req = r_ping == 1'b0 ? m_data_req : 1'b0;
 assign pang_m_data_req = r_ping == 1'b1 ? m_data_req : 1'b0;
 
 assign m_data_end = ping_m_data_end | pang_m_data_end;
+
+always @(posedge clk ) begin
+    if(rst)begin
+        m_row_num <= {{IMG_H_W}{1'b0}};
+    end
+    else begin
+        m_row_num <= cfg_img_h[IMG_H_W - 1 : 3] + (|cfg_img_h[2:0]);
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        m_row_cnt <= {{IMG_H_W}{1'b0}};
+    end
+    else begin
+        if(m_frame_end)begin
+            m_row_cnt <= {{IMG_H_W}{1'b0}}
+        end
+        else if(m_data_valid & m_data_last)begin
+            m_row_cnt <= m_row_cnt + {{{IMG_H_W - 1}{1'b0}}, 1'b1};
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        m_frame_end_r <= 1'b0;
+    end
+    else begin
+        m_frame_end_r <= m_row_cnt == (m_row_num - {{{IMG_H_W - 1}{1'b0}}, 1'b1});
+    end
+end
+
+assign m_frame_end = m_frame_end_r & m_data_valid & m_data_last;
 
 endmodule
