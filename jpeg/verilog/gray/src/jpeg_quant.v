@@ -7,6 +7,7 @@ module jpeg_quant (
 
     input [25:0]   s_data           ,
     input          s_data_valid     ,
+    input          s_frame_end      ,
     input          s_data_last      ,
 
     output         div_lum_ren      ,
@@ -16,6 +17,7 @@ module jpeg_quant (
     output [11:0]  m_data           ,
     output [5:0]   m_zero_cnt       ,
     output         m_data_valid     ,
+    output         m_frame_end      ,
     output         m_data_last      
 );
 
@@ -37,6 +39,10 @@ reg [5:0]  zero_cnt_ff;
 reg [11:0] round_data_ff;
 reg        valid;
 reg        valid_zero_last;
+
+reg m_frame_end_flag;
+reg m_frame_end_r   ;
+
 
 always @(posedge clk ) begin
     if(rst)begin
@@ -134,9 +140,38 @@ always @(posedge clk ) begin
     end
 end
 
+always @(posedge clk ) begin
+    if(rst)begin
+        m_frame_end_flag <= 1'b0;
+    end
+    else begin
+        if(s_frame_end)begin
+            m_frame_end_flag <= 1'b1;
+        end
+        else if(m_frame_end)begin
+            m_frame_end_flag <= 1'b0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        m_frame_end_r <= 1'b0;
+    end
+    else begin
+        if(m_frame_end_flag & s_data_last_ff[5])begin
+            m_frame_end_r <= 1'b1;
+        end
+        else begin
+            m_frame_end_r <= 1'b0;
+        end
+    end
+end
+
 assign m_data       = round_data_ff     ;
 assign m_zero_cnt   = valid_zero_last ? zero_cnt : zero_cnt_ff;
 assign m_data_valid = valid             ;
+assign m_frame_end  = m_frame_end_r     ;
 assign m_data_last  = s_data_last_ff [6];
     
 endmodule

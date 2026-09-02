@@ -7,6 +7,7 @@ module jpeg_huffman (
     input  [11:0]  s_data           ,
     input  [5:0]   s_zero_cnt       ,
     input          s_data_valid     ,
+    input          s_frame_end      ,
     input          s_data_last      ,
 
     output [3:0]   dc_raddr         ,
@@ -22,6 +23,7 @@ module jpeg_huffman (
     output [3:0]   m_bits           ,
     output [11:0]  m_data           ,
     output         m_data_valid     ,
+    output         m_frame_end      ,
     output         m_data_last       
 );
 
@@ -62,6 +64,9 @@ reg [3:0]  n_bits_ff [1:0];
 reg [1:0]  zero_state; //00->zero<16, 01->zero>=16, 10->last&zero>0&data==0, 
 reg [1:0]  zero_state_ff [3:0];
 reg        zero_16;
+
+reg m_frame_end_flag;
+reg m_frame_end_r   ;
 
 assign fifo_m_ready = !calc_state;
 assign fifo_s_data  = {s_data, s_zero_cnt, s_data_last};
@@ -337,11 +342,40 @@ always @(posedge clk ) begin
     n_bits_ff[1] <= n_bits_ff[0];
 end
 
+always @(posedge clk ) begin
+    if(rst)begin
+        m_frame_end_flag <= 1'b0;
+    end
+    else begin
+        if(s_frame_end)begin
+            m_frame_end_flag <= 1'b1;
+        end
+        else if(m_frame_end)begin
+            m_frame_end_flag <= 1'b0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        m_frame_end_r <= 1'b0;
+    end
+    else begin
+        if(m_frame_end_flag & t_last_ff[2])begin
+            m_frame_end_r <= 1'b1;
+        end
+        else begin
+            m_frame_end_r <= 1'b0;
+        end
+    end
+end
+
 assign m_len  = first_flag_ff[4] ? {1'b0, dc_len }: ac_len ;
 assign m_code = first_flag_ff[4] ? {4'b0, dc_code}: ac_code;
 assign m_bits = zero_state_ff[3] == 2'b00 ? n_bits_ff[1]   :  4'd0;
 assign m_data = zero_state_ff[3] == 2'b00 ? pipe_2_1_ff[2] : 12'd0;
 assign m_data_valid = (t_valid_ff[4] & first_flag_ff[4]) | zero_valid_ff[3];
+assign m_frame_end  = m_frame_end_r;
 assign m_data_last  = t_last_ff[3];
 
 assign dc_raddr = s_dc_raddr;

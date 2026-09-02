@@ -4,9 +4,11 @@ module jpeg_dct (
 
     input [63:0]  s_data      ,
     input         s_data_valid,
+    input         s_frame_end ,
     input         s_data_last ,
 
     output [25:0] m_data      ,
+    output        m_frame_end ,
     output        m_data_valid,
     output        m_data_last 
 );
@@ -18,6 +20,9 @@ localparam MAGIC_3 = 10'b0101001110; //1.306562965
 
 
 genvar i, j;
+
+reg [21:0] s_frame_end_ff;
+reg        m_frame_end_flag;
 
 reg [9:0] pipe_0 [7:0];
 
@@ -68,6 +73,33 @@ reg [23:0] pipe_7 [7:0];
 
 reg [9:0] pipe_valid_0;
 reg [9:0] pipe_last_0 ;
+
+always @(posedge clk ) begin
+    if(rst)begin
+        s_frame_end_ff <= 22'd0;
+    end
+    else begin
+        s_frame_end_ff <= {s_frame_end_ff[20:0], s_frame_end};
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        m_frame_end_flag <= 1'b0;
+    end
+    else begin
+        if(s_frame_end_ff[21])begin
+            m_frame_end_flag <= 1'b1;
+        end
+        else begin
+            if(m_frame_end)begin
+                m_frame_end_flag <= 1'b0;
+            end
+        end
+    end
+end
+
+assign m_frame_end = m_frame_end_flag & m_data_last;
 
 generate
     for (i = 0; i < 8; i = i + 1) begin : LOOP_MINUS_128

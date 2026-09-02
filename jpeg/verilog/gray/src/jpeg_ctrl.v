@@ -13,6 +13,7 @@ module jpeg_ctrl (
     input [3:0]    huffman_s_bits      ,
     input [11:0]   huffman_s_data      ,
     input          huffman_s_data_valid,
+    input          huffman_s_frame_end ,
     input          huffman_s_data_last ,
 
     output [63:0]  m_data              ,
