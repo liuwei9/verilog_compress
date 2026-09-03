@@ -50,6 +50,9 @@ reg [6:0]   huffman_64_p_bits;
 reg [127:0] huffman_128;
 reg [7:0]   huffman_128_bits;
 reg [63:0]  huffman_data;
+reg         huffman_data_valid_1;
+
+reg [7:0]   huffman_s_frame_end_ff;
 
 always @(posedge clk ) begin
     if(rst)begin
@@ -319,10 +322,35 @@ always @(posedge clk ) begin
     end   
 end
 
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_data_valid_1 <= 1'b0;
+    end
+    else begin
+        if(huffman_128_bits >= 8'd64)begin
+            huffman_data_valid_1 <= 1'b1;
+        end
+        else begin
+            huffman_data_valid_1 <= 1'b0;
+        end
+    end
+end
 
-assign m_data       = head_valid ? head_data : 64'd0;
-assign m_data_keep  = head_valid ? 8'b1111_1111 : 8'd0;
-assign m_data_valid = head_valid ;
-assign m_data_last  = head_valid ? head_last : 1'b0;
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_s_frame_end_ff <= 8'd0;
+    end
+    else begin
+        huffman_s_frame_end_ff <= {huffman_s_frame_end_ff[6:0], huffman_s_frame_end};
+    end
+end
+
+
+assign m_data       = head_valid                ? head_data    : 
+                      huffman_s_frame_end_ff[7] ? 64'hFFD9     :
+                                                  huffman_data ;
+assign m_data_keep  = 8'b1111_1111;
+assign m_data_valid = head_valid | huffman_data_valid_1 | huffman_s_frame_end_ff[6];
+assign m_data_last  = huffman_s_frame_end_ff[7];
     
 endmodule

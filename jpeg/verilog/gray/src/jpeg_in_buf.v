@@ -15,6 +15,7 @@ module jpeg_in_buf #(
     output [63:0]                   m_data      ,
     output                          m_data_valid,
     output                          m_data_last ,
+    output                          m_data_user ,
     input                           m_data_req  ,
     output                          m_data_end  
 );
@@ -50,6 +51,7 @@ reg  [6:0] rd_cnt;
 reg [63:0] s_m_data      ;
 reg        s_m_data_valid;
 reg        s_m_data_last ;
+reg        s_m_data_user ;
 reg        s_m_data_end  ;
 
 always @(posedge clk ) begin
@@ -229,12 +231,14 @@ always @(posedge clk ) begin
                 rd_cnt == 6'd9  ? rdata[6] :
                 rd_cnt == 6'd10 ? rdata[7] : 64'd0;
     s_m_data_last  <= rd_cnt == 6'd10;
+    s_m_data_user  <= (raddr[0] == wlen) && (rd_cnt == 6'd10);
     s_m_data_valid <= (rd_cnt >= 6'd3) && (rd_cnt <= 6'd10);
 end
 
 assign m_data       = s_m_data      ;
 assign m_data_valid = s_m_data_valid;
 assign m_data_last  = s_m_data_last ;
+assign m_data_user  = s_m_data_user ;
 assign m_data_end   = s_m_data_end  ;
 
 generate

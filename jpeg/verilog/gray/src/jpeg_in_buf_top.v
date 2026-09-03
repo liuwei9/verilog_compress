@@ -45,12 +45,14 @@ wire                          pang_s_data_done ;
 wire [63:0]                   ping_m_data      ;
 wire                          ping_m_data_valid;
 wire                          ping_m_data_last ;
+wire                          ping_m_data_user ;
 wire                          ping_m_data_req  ;
 wire                          ping_m_data_end  ;
 
 wire [63:0]                   pang_m_data      ;
 wire                          pang_m_data_valid;
 wire                          pang_m_data_last ;
+wire                          pang_m_data_user ;
 wire                          pang_m_data_req  ;
 wire                          pang_m_data_end  ;
 
@@ -100,12 +102,14 @@ jpeg_in_buf_ctrl #(
     .ping_m_data       (ping_m_data      ),
     .ping_m_data_valid (ping_m_data_valid),
     .ping_m_data_last  (ping_m_data_last ),
+    .ping_m_data_user  (ping_m_data_user ),
     .ping_m_data_req   (ping_m_data_req  ),
     .ping_m_data_end   (ping_m_data_end  ),
 
     .pang_m_data       (pang_m_data      ),
     .pang_m_data_valid (pang_m_data_valid),
     .pang_m_data_last  (pang_m_data_last ),
+    .pang_m_data_user  (pang_m_data_user ),
     .pang_m_data_req   (pang_m_data_req  ),
     .pang_m_data_end   (pang_m_data_end  )
 );
@@ -127,6 +131,7 @@ jpeg_in_buf #(
     .m_data       (ping_m_data      ),
     .m_data_valid (ping_m_data_valid),
     .m_data_last  (ping_m_data_last ),
+    .m_data_user  (ping_m_data_user ),
     .m_data_req   (ping_m_data_req  ),
     .m_data_end   (ping_m_data_end  )
 );
@@ -148,6 +153,7 @@ jpeg_in_buf #(
     .m_data       (pang_m_data      ),
     .m_data_valid (pang_m_data_valid),
     .m_data_last  (pang_m_data_last ),
+    .m_data_user  (pang_m_data_user ),
     .m_data_req   (pang_m_data_req  ),
     .m_data_end   (pang_m_data_end  )
 );

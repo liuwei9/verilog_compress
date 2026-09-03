@@ -44,12 +44,14 @@ module jpeg_in_buf_ctrl #(
     input [63:0]                    ping_m_data      ,
     input                           ping_m_data_valid,
     input                           ping_m_data_last ,
+    input                           ping_m_data_user ,
     output                          ping_m_data_req  ,
     input                           ping_m_data_end  ,
 
     input [63:0]                    pang_m_data      ,
     input                           pang_m_data_valid,
     input                           pang_m_data_last ,
+    input                           pang_m_data_user ,
     output                          pang_m_data_req  ,
     input                           pang_m_data_end  
 );
@@ -259,9 +261,9 @@ always @(posedge clk ) begin
     end
     else begin
         if(m_frame_end)begin
-            m_row_cnt <= {{IMG_H_W}{1'b0}}
+            m_row_cnt <= {{IMG_H_W}{1'b0}};
         end
-        else if(m_data_valid & m_data_last)begin
+        else if(pang_m_data_user | ping_m_data_user)begin
             m_row_cnt <= m_row_cnt + {{{IMG_H_W - 1}{1'b0}}, 1'b1};
         end
     end
@@ -276,6 +278,6 @@ always @(posedge clk ) begin
     end
 end
 
-assign m_frame_end = m_frame_end_r & m_data_valid & m_data_last;
+assign m_frame_end = m_frame_end_r & (pang_m_data_user | ping_m_data_user);
 
 endmodule
