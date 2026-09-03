@@ -24,13 +24,12 @@ module jpeg_ctrl (
 
 genvar i;
 
-localparam IDLE = 4'b0001;
-localparam HEAD = 4'b0010;
-localparam WAIT = 4'b0100;
-localparam DATA = 4'b1000;
+localparam IDLE = 3'b001;
+localparam HEAD = 3'b010;
+localparam WAIT = 3'b100;
 
-reg [3:0] curr_state;
-reg [3:0] next_state;
+reg [2:0] curr_state;
+reg [2:0] next_state;
 
 reg [2:0]  head_cnt  ;
 reg [63:0] head_data ;
@@ -82,10 +81,12 @@ always @(*) begin
             end
         end
         WAIT: begin
-            
-        end
-        DATA: begin
-            
+            if(m_data_valid & m_data_last)begin
+                next_state = IDLE;
+            end
+            else begin
+                next_state = WAIT;
+            end
         end
         default: begin
             next_state = IDLE;

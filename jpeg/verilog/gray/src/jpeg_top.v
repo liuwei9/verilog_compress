@@ -22,7 +22,12 @@ module jpeg_top #(
     output [31:0]  s_cmd_addr       ,
     output [31:0]  s_cmd_len        ,
     output         s_cmd_valid      ,
-    input          s_cmd_ready      
+    input          s_cmd_ready      ,
+
+    output [63:0]  m_data           ,
+    output [ 7:0]  m_data_keep      ,
+    output         m_data_valid     ,
+    output         m_data_last      
 );
 
 wire         quant_lum_ren       ;
@@ -246,10 +251,10 @@ jpeg_ctrl jpeg_ctrl_inst(
     .huffman_s_frame_end  (huffman_m_frame_end ),
     .huffman_s_data_last  (huffman_m_data_last ),
 
-    .m_data               (ctrl_m_data         ),
-    .m_data_keep          (ctrl_m_data_keep    ),
-    .m_data_valid         (ctrl_m_data_valid   ),
-    .m_data_last          (ctrl_m_data_last    )
+    .m_data               (m_data              ),
+    .m_data_keep          (m_data_keep         ),
+    .m_data_valid         (m_data_valid        ),
+    .m_data_last          (m_data_last         )
 );
     
 endmodule
