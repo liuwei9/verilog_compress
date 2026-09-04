@@ -3,11 +3,9 @@ module tb_save #(
 ) (
     input         clk         ,
     input         rst         ,
-    input         calc_last   ,
     input [63:0]  m_data      ,
     input         m_data_valid,
-    input         m_data_last ,
-    input         m_data_ready
+    input         m_data_last 
 );
 
 integer fp;
@@ -18,13 +16,13 @@ initial begin
         $display("error : cannot open %s", FILE_PATH);
     $stop;
     end
-    wait(calc_last);
+    wait(m_data_last);
     repeat(5) @(posedge clk);
     $fclose(fp);
 end
 
 always @(posedge clk ) begin
-    if(m_data_valid & m_data_ready)begin
+    if(m_data_valid)begin
         $fwrite(fp, "%d\n", m_data[7:0]);
         $fwrite(fp, "%d\n", m_data[15:8]);
         $fwrite(fp, "%d\n", m_data[23:16]);

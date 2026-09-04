@@ -109,7 +109,8 @@ always @(posedge clk ) begin
 end
 
 always @(posedge clk ) begin
-    head_data <= {head_data[55:0], jpeg_head_data};
+    // head_data <= {head_data[55:0], jpeg_head_data};
+    head_data <= {jpeg_head_data, head_data[63:8]};
 end
 
 always @(posedge clk ) begin
