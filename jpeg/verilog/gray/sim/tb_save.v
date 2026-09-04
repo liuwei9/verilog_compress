@@ -11,7 +11,7 @@ module tb_save #(
 integer fp;
 initial begin
     repeat(5) @(posedge clk);
-    fp = $fopen(FILE_PATH,"w");
+    fp = $fopen(FILE_PATH,"wb");
     if(fp == 0)begin
         $display("error : cannot open %s", FILE_PATH);
     $stop;
@@ -23,14 +23,14 @@ end
 
 always @(posedge clk ) begin
     if(m_data_valid)begin
-        $fwrite(fp, "%d\n", m_data[7:0]);
-        $fwrite(fp, "%d\n", m_data[15:8]);
-        $fwrite(fp, "%d\n", m_data[23:16]);
-        $fwrite(fp, "%d\n", m_data[31:24]);
-        $fwrite(fp, "%d\n", m_data[39:32]);
-        $fwrite(fp, "%d\n", m_data[47:40]);
-        $fwrite(fp, "%d\n", m_data[55:48]);
-        $fwrite(fp, "%d\n", m_data[63:56]);
+        $fwrite(fp, "%c", m_data[7:0]);
+        $fwrite(fp, "%c", m_data[15:8]);
+        $fwrite(fp, "%c", m_data[23:16]);
+        $fwrite(fp, "%c", m_data[31:24]);
+        $fwrite(fp, "%c", m_data[39:32]);
+        $fwrite(fp, "%c", m_data[47:40]);
+        $fwrite(fp, "%c", m_data[55:48]);
+        $fwrite(fp, "%c", m_data[63:56]);
     end
 end
     
