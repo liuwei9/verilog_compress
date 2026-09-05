@@ -89,13 +89,21 @@ always @(posedge clk ) begin
     end
 end
 
+reg [WD - 1:0] m_data_temp;
+
+always @(posedge clk ) begin
+    if(pipe_m_valid & pipe_m_ready)begin
+        m_data_temp <= pipe_m_data;
+    end
+end
+
 assign rdata = mem[raddr];
 
 assign pipe_s_data  = rdata;
 assign pipe_s_valid = ren;
 assign ren = (cnt > 0);
 
-assign m_data  = pipe_m_data[WD - 1 : 0];
+assign m_data  = pipe_m_valid & pipe_m_ready ? pipe_m_data[WD - 1 : 0] : m_data_temp;
 assign m_valid = pipe_m_valid;
 assign pipe_m_ready = m_ready;
 assign pipe_s_fire = (pipe_s_valid == 1'b1) && (pipe_s_ready == 1'b1);

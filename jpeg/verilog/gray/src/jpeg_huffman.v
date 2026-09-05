@@ -80,7 +80,7 @@ always @(posedge clk ) begin
         calc_state <= 1'b0;
     end
     else begin
-        if((fifo_m_ready & fifo_m_valid) && ((t_zero_cnt == 6'd16) && (t_data != 12'd0)) || ((!t_data_last) & (t_zero_cnt > 6'd16)))begin
+        if((fifo_m_ready & fifo_m_valid) && (((t_zero_cnt == 6'd16) && (t_data != 12'd0)) || ((!t_data_last) & (t_zero_cnt > 6'd16))))begin
             calc_state <= 1'b1;
         end
         else if(zero_cnt == 5'd0)begin

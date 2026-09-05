@@ -9,7 +9,7 @@ parameter MAX_IMG_W      = 1280;
 parameter QUANT_LUM_PATH = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/quantLumMatrix.mem";
 parameter DIV_LUM_PATH   = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/divLumMatrix.mem"  ;
 parameter IMG_FILE_PATH  = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_img.txt";
-parameter IMG_FILE_LEN   = 921600;
+parameter IMG_FILE_LEN   = 115200;
 parameter DUT_FILE_PATH  = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_jpeg.jpeg";
 
 wire [15:0]   cfg_img_h    = 720  ;
