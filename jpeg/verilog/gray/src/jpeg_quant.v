@@ -85,10 +85,27 @@ always @(posedge clk ) begin
     div_lum_rdata_ff[0] <= div_lum_rdata;
     div_lum_rdata_ff[1] <= div_lum_rdata_ff[0];
 end
+// reg [19:0] test_mem [921600 - 1:0];
+// reg [31:0]  addr;
+// initial begin
+//     $readmemh("E:/isp/MATLAB_Jpeg_encoder_master/jpeg_gray/quant_data.txt", test_mem);
+// end
+
+// always @(posedge clk ) begin
+//     if(rst)begin
+//         addr <= 32'd0;
+//     end
+//     else begin
+//         if(s_data_valid_ff[4])begin
+//             addr <= addr + 1;
+//         end
+//     end
+// end
 
 always @(posedge clk ) begin
     mul_data   <= $signed(div_lum_rdata_ff[1]) * $signed(s_data_ff[3]);
     round_data <= $signed(mul_data[43:24]) + $signed({19'd0, mul_data[23]});
+    // round_data <= test_mem[addr];
 end
 
 always @(posedge clk ) begin

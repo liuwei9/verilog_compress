@@ -71,7 +71,7 @@ reg m_frame_end_r   ;
 assign fifo_m_ready = !calc_state;
 assign fifo_s_data  = {s_data, s_zero_cnt, s_data_last};
 assign fifo_s_valid = s_data_valid;
-assign t_data_last  = fifo_m_data[0] & fifo_m_valid;
+assign t_data_last  = fifo_m_data[0];
 assign t_zero_cnt   = fifo_m_data[6:1];
 assign t_data       = fifo_m_data[18:7];
 
@@ -95,12 +95,15 @@ always @(posedge clk ) begin
     end
     else begin
         if(fifo_m_valid & fifo_m_ready)begin
-            if(t_data_last)begin
+            if(t_data_last & (!((t_data != 12'd0) & (t_zero_cnt >= 6'd16))))begin
                 first_flag <= 1'b1;
             end
             else begin
                 first_flag <= 1'b0;
             end
+        end
+        else if(last_flag & (zero_cnt < 6'd32))begin
+            first_flag <= 1'b1;
         end
     end
 end

@@ -458,7 +458,8 @@ always @(posedge clk ) begin
     pipe_30_0_b_ff[1] <= pipe_30_0_b_ff[0];
 
     pipe_30_0_t <= $signed(pipe_30_0_ff[1]) * $signed(pipe_30_0_b_ff[1]);
-    pipe_40_0 <= $signed(pipe_30_0_t[33:8]) + $signed({1'b0, pipe_30_0_t[7]});
+    // pipe_40_0 <= $signed(pipe_30_0_t[33:8]) + $signed({1'b0, pipe_30_0_t[7]});
+    pipe_40_0 <= $signed(pipe_30_0_t[33:8]);
 end
 
 //z5 = (tmp10 - tmp12) * 0.382683433;
@@ -471,7 +472,8 @@ always @(posedge clk ) begin
     pipe_30_1_b_ff[1] <= pipe_30_1_b_ff[0];
 
     pipe_30_1_t <= $signed(pipe_30_1_ff[1]) * $signed(pipe_30_1_b_ff[1]);
-    pipe_40_1 <= $signed(pipe_30_1_t[33:8]) + $signed({1'b0, pipe_30_1_t[7]});
+    // pipe_40_1 <= $signed(pipe_30_1_t[33:8]) + $signed({1'b0, pipe_30_1_t[7]});
+    pipe_40_1 <= $signed(pipe_30_1_t[33:8]);
 end
 
 //z2 = 0.541196100 * tmp10 + z5;
@@ -495,8 +497,10 @@ always @(posedge clk ) begin
     pipe_30_2_t <= $signed(pipe_20_0_ff[2]) * $signed(pipe_20_0_b_ff[2]);
     pipe_30_3_t <= $signed(pipe_20_1_ff[2]) * $signed(pipe_20_1_b_ff[2]);
 
-    pipe_40_2 <= $signed(pipe_30_2_t[33:8]) + $signed({1'b0, pipe_30_2_t[7]});
-    pipe_40_3 <= $signed(pipe_30_3_t[33:8]) + $signed({1'b0, pipe_30_3_t[7]});
+    // pipe_40_2 <= $signed(pipe_30_2_t[33:8]) + $signed({1'b0, pipe_30_2_t[7]});
+    // pipe_40_3 <= $signed(pipe_30_3_t[33:8]) + $signed({1'b0, pipe_30_3_t[7]});
+    pipe_40_2 <= $signed(pipe_30_2_t[33:8]);
+    pipe_40_3 <= $signed(pipe_30_3_t[33:8]);
 
     pipe_50_0 <= $signed(pipe_40_1) + $signed(pipe_40_2);
     pipe_50_1 <= $signed(pipe_40_1) + $signed(pipe_40_3);
@@ -517,7 +521,8 @@ always @(posedge clk ) begin
     pipe_20_2_b_ff[3] <= pipe_20_2_b_ff[2];
 
     pipe_30_4_t <= $signed(pipe_20_2_ff[3]) * $signed(pipe_20_2_b_ff[3]);
-    pipe_50_2   <= $signed(pipe_30_4_t[33:8]) + $signed({1'b0, pipe_30_4_t[7]});
+    // pipe_50_2   <= $signed(pipe_30_4_t[33:8]) + $signed({1'b0, pipe_30_4_t[7]});
+    pipe_50_2   <= $signed(pipe_30_4_t[33:8]);
 end
 
 //z11 = tmp7 + z3;
