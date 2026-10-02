@@ -1,6 +1,7 @@
 module tb_read_data #(
-    parameter FILE_PATH = "",
-    parameter FILE_LEN  = 0  
+    parameter IMG_PATH = ""    ,
+    parameter IMG_H    = 1024  ,
+    parameter IMG_W    = 1024
 ) (
     input          clk          ,
     input          rst          ,
@@ -21,65 +22,64 @@ module tb_read_data #(
 assign cmd_ready = 1'b1;
 assign data_keep = 8'b1111_1111;
 
-reg [31:0] addr;
-reg [31:0] len;
-reg [31:0] cnt;
-reg valid;
+reg [2:0]  cnt;
+reg [63:0] data_r      ;
+reg        data_valid_r;
+reg        data_last_r ;
+wire [7:0] m_data      ;
+wire       m_data_valid;
+wire       m_data_last ;
 
-reg [63:0] mem [FILE_LEN - 1:0];
-
-initial begin
-    $readmemh(FILE_PATH, mem);
+always @(posedge clk ) begin
+    if(rst)begin
+        cnt <= 3'd0;
+    end
+    else begin
+        if(cmd_valid & cmd_ready)begin
+            cnt <= 3'd0;
+        end
+        else begin
+            if(m_data_valid & data_ready)begin
+                cnt <= cnt + 3'd1;
+            end
+        end
+    end
 end
 
 always @(posedge clk ) begin
-    if(cmd_valid & cmd_ready)begin
-        len <= cmd_len / 8;
+    if(m_data_valid)begin
+        data_r <= {m_data, data_r[63:8]};
     end
 end
 
 always @(posedge clk ) begin
     if(rst)begin
-        valid <= 1'b0;
-    end
-    else if(cmd_valid & cmd_ready)begin
-        valid <= 1'b1;
+        data_valid_r <= 1'b0;
+        data_last_r  <= 1'b0;
     end
     else begin
-        if(data_valid & data_ready & data_last)begin
-            valid <= 1'b0;
-        end
+        data_valid_r <= m_data_valid && (&cnt | m_data_last);
+        data_last_r  <= m_data_last;
     end
 end
 
-always @(posedge clk ) begin
-    if(rst)begin
-        addr <= 32'd0;
-    end
-    else begin
-        if(data_valid & data_ready)begin
-            addr <= addr + 1'b1;
-        end
-    end
-end
+assign data       = data_r      ;
+assign data_valid = data_valid_r;
+assign data_last  = data_last_r ;
 
-always @(posedge clk ) begin
-    if(cmd_valid & cmd_ready)begin
-        cnt <= 32'd0;
-    end
-    else begin
-        if(data_valid & data_ready & data_last)begin
-            cnt <= 32'd0;
-        end
-        else if(data_valid & data_ready)begin
-            cnt <= cnt + 32'd1;
-        end
-    end
-end
-
-
-assign data_last = cnt == len - 1;
-assign data = mem[addr];
-assign data_valid = valid;
+read_bmp #(
+    .IMG_PATH     (IMG_PATH ),
+    .IMG_N        (8        ), //8->gray, 24->rgb
+    .IMG_H        (IMG_H    ),
+    .IMG_W        (IMG_W    )
+) read_bmp_inst (
+    .clk          (clk      ),
+    .rst          (rst      ),
+    .m_data_req   (cmd_valid & cmd_ready),
+    .m_data       (m_data      ),//{r,g,b} or gray
+    .m_data_valid (m_data_valid),
+    .m_data_last  (m_data_last ),
+    .m_data_ready (data_ready  )
+);
     
 endmodule

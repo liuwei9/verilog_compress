@@ -8,8 +8,7 @@ parameter MAX_IMG_H      = 720 ;
 parameter MAX_IMG_W      = 1280;
 parameter QUANT_LUM_PATH = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/quantLumMatrix.mem";
 parameter DIV_LUM_PATH   = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/divLumMatrix.mem"  ;
-parameter IMG_FILE_PATH  = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_img.txt";
-parameter IMG_FILE_LEN   = 115200;
+parameter IMG_FILE_PATH  = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_img.bmp";
 parameter DUT_FILE_PATH  = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_jpeg.jpeg";
 
 wire [15:0]   cfg_img_h    = 720  ;
@@ -85,8 +84,9 @@ jpeg_top #(
 );
 
 tb_read_data #(
-    .FILE_PATH (IMG_FILE_PATH),
-    .FILE_LEN  (IMG_FILE_LEN ) 
+    .IMG_PATH     (IMG_FILE_PATH),
+    .IMG_H        (MAX_IMG_H    ),
+    .IMG_W        (MAX_IMG_W    )
 ) tb_read_data_inst (
     .clk          (clk              ),
     .rst          (rst              ),

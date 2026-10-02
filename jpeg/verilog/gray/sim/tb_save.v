@@ -16,7 +16,7 @@ initial begin
     // fp_2 = $fopen("E:/python_image_sim/pythonProject/jpeg/img/aaa.txt","w");
     if(fp == 0)begin
         $display("error : cannot open %s", FILE_PATH);
-    $stop;
+        $stop;
     end
     wait(m_data_last);
     repeat(5) @(posedge clk);
