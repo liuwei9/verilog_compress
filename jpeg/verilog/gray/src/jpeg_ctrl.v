@@ -158,6 +158,9 @@ always @(posedge clk ) begin
     if(rst)begin
         huffman_64_bits <= 7'd0;
     end
+    else if(jpeg_start)begin
+        huffman_64_bits <= 7'd0;
+    end
     else if(huffman_64_bits >= 7'd32)begin
         huffman_64_bits <= huffman_64_bits - 7'd32 + huffman_data_temp_bits;
     end
@@ -182,6 +185,9 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
+        huffman_32_bits <= 6'd0;
+    end
+    else if(jpeg_start)begin
         huffman_32_bits <= 6'd0;
     end
     else begin
@@ -217,6 +223,9 @@ always @(posedge clk ) begin
     if(rst)begin
         huffman_32_padding_bits[0] <= 5'd0;
     end
+    else if(jpeg_start)begin
+        huffman_32_padding_bits[0] <= 5'd0;
+    end
     else if(huffman_32_bits >= 6'd8)begin
         if(huffman_32[7:0] == 8'hFF)begin
             huffman_32_padding_bits[0] <= 5'd16;
@@ -232,6 +241,9 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
+        huffman_32_padding_bits[1] <= 5'd0;
+    end
+    else if(jpeg_start)begin
         huffman_32_padding_bits[1] <= 5'd0;
     end
     else if(huffman_32_bits > 6'd8)begin
@@ -254,6 +266,9 @@ always @(posedge clk ) begin
     if(rst)begin
         huffman_32_padding_bits[2] <= 5'd0;
     end
+    else if(jpeg_start)begin
+        huffman_32_padding_bits[2] <= 5'd0;
+    end
     else if(huffman_32_bits > 6'd16)begin
         if(huffman_32[23:16] == 8'hFF)begin
             huffman_32_padding_bits[2] <= 5'd16;
@@ -272,6 +287,9 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
+        huffman_32_padding_bits[3] <= 5'd0;
+    end
+    else if(jpeg_start)begin
         huffman_32_padding_bits[3] <= 5'd0;
     end
     else if(huffman_32_bits > 6'd24)begin
@@ -341,6 +359,9 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
+        huffman_128_bits <= 8'd0;
+    end
+    else if(jpeg_start)begin
         huffman_128_bits <= 8'd0;
     end
     else if(huffman_128_bits >= 8'd64)begin

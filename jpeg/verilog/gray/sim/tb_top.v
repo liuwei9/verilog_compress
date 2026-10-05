@@ -8,8 +8,6 @@ parameter MAX_IMG_H      = 720 ;
 parameter MAX_IMG_W      = 1280;
 parameter QUANT_LUM_PATH = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/quantLumMatrix.mem";
 parameter DIV_LUM_PATH   = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/divLumMatrix.mem"  ;
-parameter IMG_FILE_PATH  = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_img.bmp";
-parameter DUT_FILE_PATH  = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_jpeg.jpeg";
 
 wire [15:0]   cfg_img_h    = 720  ;
 wire [15:0]   cfg_img_w    = 1280 ;
@@ -43,20 +41,65 @@ initial begin
     rst = 1'b0;
 end
 
-initial begin
-    jpeg_start = 1'b0;
-    #700
-    jpeg_start = 1'b1;
-    #10
-    jpeg_start = 1'b0;
-end
-
+string jpeg_path_pre = "E:/python_image_sim/pythonProject/jpeg/img/dut_gray_jpeg";
+string jpeg_path;
 initial begin
     load_img("E:/python_image_sim/pythonProject/jpeg/img/dut_gray_img.bmp");
+    jpeg_start   = 1'b0 ;
+    cfg_quality  = 10   ;
+    jpeg_path = $sformatf("%s_%0d.jpeg", jpeg_path_pre, cfg_quality);
+    #700
+    jpeg_start   = 1'b1 ;
+    #10
+    jpeg_start   = 1'b0 ;
     fork
         read_bmp_gray();
-        save_jpeg("E:/python_image_sim/pythonProject/jpeg/img/dut_gray_jpeg.jpeg");
-    join    
+        save_jpeg(jpeg_path);
+    join 
+    jpeg_start   = 1'b0 ;
+    cfg_quality  = 20   ;
+    jpeg_path = $sformatf("%s_%0d.jpeg", jpeg_path_pre, cfg_quality);
+    #700
+    jpeg_start   = 1'b1 ;
+    #10
+    jpeg_start   = 1'b0 ;
+    fork
+        read_bmp_gray();
+        save_jpeg(jpeg_path);
+    join  
+    jpeg_start   = 1'b0 ;
+    cfg_quality  = 50   ;
+    jpeg_path = $sformatf("%s_%0d.jpeg", jpeg_path_pre, cfg_quality);
+    #700
+    jpeg_start   = 1'b1 ;
+    #10
+    jpeg_start   = 1'b0 ;
+    fork
+        read_bmp_gray();
+        save_jpeg(jpeg_path);
+    join   
+    jpeg_start   = 1'b0 ;
+    cfg_quality  = 80   ;
+    jpeg_path = $sformatf("%s_%0d.jpeg", jpeg_path_pre, cfg_quality);
+    #700
+    jpeg_start   = 1'b1 ;
+    #10
+    jpeg_start   = 1'b0 ;
+    fork
+        read_bmp_gray();
+        save_jpeg(jpeg_path);
+    join  
+    jpeg_start   = 1'b0 ;
+    cfg_quality  = 100  ;
+    jpeg_path = $sformatf("%s_%0d.jpeg", jpeg_path_pre, cfg_quality);
+    #700
+    jpeg_start   = 1'b1 ;
+    #10
+    jpeg_start   = 1'b0 ;
+    fork
+        read_bmp_gray();
+        save_jpeg(jpeg_path);
+    join            
     $finish;
 end
 
@@ -96,36 +139,6 @@ jpeg_top #(
     .m_data_last      (m_data_last      )
 );
 
-// tb_read_data #(
-//     .IMG_PATH     (IMG_FILE_PATH),
-//     .IMG_H        (MAX_IMG_H    ),
-//     .IMG_W        (MAX_IMG_W    )
-// ) tb_read_data_inst (
-//     .clk          (clk              ),
-//     .rst          (rst              ),
-//     .start        (jpeg_start       ),
-
-//     .cmd_addr     (s_cmd_addr       ),
-//     .cmd_len      (s_cmd_len        ),
-//     .cmd_valid    (s_cmd_valid      ),
-//     .cmd_ready    (s_cmd_ready      ),
-
-//     .data         (s_data           ),
-//     .data_keep    (s_data_keep      ),
-//     .data_valid   (s_data_valid     ),
-//     .data_last    (s_data_last      ),
-//     .data_ready   (s_data_ready     )  
-// );
-
-// tb_save #(
-//     .FILE_PATH (DUT_FILE_PATH)
-// ) tb_save_inst (
-//     .clk          (clk          ),
-//     .rst          (rst          ),
-//     .m_data       (m_data       ),
-//     .m_data_valid (m_data_valid ),
-//     .m_data_last  (m_data_last  )
-// );
 integer fp;
 reg [7:0] mem [MAX_IMG_H * MAX_IMG_W * 4 - 1:0];
 reg [7:0] file_header [53:0];
@@ -161,9 +174,9 @@ task automatic load_img;
     @(posedge clk);
 
 endtask
-
+integer cnt;
 task automatic read_bmp_gray;
-    integer cnt;
+    
     s_data_valid <= 1'b0;   
     s_data_last  <= 1'b0;
     s_cmd_ready  <= 1'b1;
