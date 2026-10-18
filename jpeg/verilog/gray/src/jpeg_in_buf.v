@@ -49,10 +49,10 @@ reg  [DP_W - 1 : 0] wlen ;
 reg  [6:0] rd_cnt;
 
 reg [63:0] s_m_data      ;
-reg        s_m_data_valid;
-reg        s_m_data_last ;
-reg        s_m_data_user ;
-reg        s_m_data_end  ;
+reg [ 1:0] s_m_data_valid;
+reg [ 1:0] s_m_data_last ;
+reg [ 1:0] s_m_data_user ;
+reg [ 1:0] s_m_data_end  ;
 
 always @(posedge clk ) begin
     if(rst)begin
@@ -82,7 +82,7 @@ always @(*) begin
             end
         end
         READ: begin
-            if(m_data_end)begin
+            if(s_m_data_user[0])begin
                 next_state = WRITE;
             end
             else begin
@@ -185,23 +185,23 @@ always @(posedge clk ) begin
     end
 end
 
-always @(posedge clk ) begin
-    if(rst)begin
-        s_m_data_end <= 1'b0;
-    end
-    else begin
-        s_m_data_end <= (raddr[0] == wlen) && (rd_cnt == 7'd65);
-    end
-end
+// always @(posedge clk ) begin
+//     if(rst)begin
+//         s_m_data_end <= 1'b0;
+//     end
+//     else begin
+//         s_m_data_end <= (raddr[0] == wlen) && (rd_cnt == 7'd65);
+//     end
+// end
 
-assign ren[0] = rd_cnt == 6'd1;
-assign ren[1] = rd_cnt == 6'd2;
-assign ren[2] = rd_cnt == 6'd3;
-assign ren[3] = rd_cnt == 6'd4;
-assign ren[4] = rd_cnt == 6'd5;
-assign ren[5] = rd_cnt == 6'd6;
-assign ren[6] = rd_cnt == 6'd7;
-assign ren[7] = rd_cnt == 6'd8;
+assign ren[0] = rd_cnt == 6'd1 ;
+assign ren[1] = rd_cnt == 6'd9 ;
+assign ren[2] = rd_cnt == 6'd17;
+assign ren[3] = rd_cnt == 6'd25;
+assign ren[4] = rd_cnt == 6'd33;
+assign ren[5] = rd_cnt == 6'd41;
+assign ren[6] = rd_cnt == 6'd49;
+assign ren[7] = rd_cnt == 6'd57;
 
 generate
     for (i = 0; i < 8; i = i+1) begin : LOOP_RADDR
@@ -222,24 +222,37 @@ generate
 endgenerate
 
 always @(posedge clk ) begin
-    s_m_data <= rd_cnt == 6'd3  ? rdata[0] :
-                rd_cnt == 6'd4  ? rdata[1] :
-                rd_cnt == 6'd5  ? rdata[2] :
-                rd_cnt == 6'd6  ? rdata[3] :
-                rd_cnt == 6'd7  ? rdata[4] :
-                rd_cnt == 6'd8  ? rdata[5] :
-                rd_cnt == 6'd9  ? rdata[6] :
-                rd_cnt == 6'd10 ? rdata[7] : 64'd0;
-    s_m_data_last  <= rd_cnt == 6'd10;
-    s_m_data_user  <= (raddr[0] == wlen) && (rd_cnt == 6'd10);
-    s_m_data_valid <= (rd_cnt >= 6'd3) && (rd_cnt <= 6'd10);
+    s_m_data <= rd_cnt == 7'd3  ? rdata[0] :
+                rd_cnt == 7'd11 ? rdata[1] :
+                rd_cnt == 7'd19 ? rdata[2] :
+                rd_cnt == 7'd27 ? rdata[3] :
+                rd_cnt == 7'd35 ? rdata[4] :
+                rd_cnt == 7'd43 ? rdata[5] :
+                rd_cnt == 7'd51 ? rdata[6] :
+                rd_cnt == 7'd59 ? rdata[7] : s_m_data;
 end
 
-assign m_data       = s_m_data      ;
-assign m_data_valid = s_m_data_valid;
-assign m_data_last  = s_m_data_last ;
-assign m_data_user  = s_m_data_user ;
-assign m_data_end   = s_m_data_end  ;
+always @(posedge clk ) begin
+    if(rst)begin
+        s_m_data_valid <= 2'd0;
+        s_m_data_last  <= 2'd0;
+        s_m_data_user  <= 2'd0;
+    end
+    else begin
+        s_m_data_valid[0] <= (rd_cnt >= 7'd2) && (rd_cnt <= 7'd65);
+        s_m_data_valid[1] <= s_m_data_valid[0];
+        s_m_data_last[0]  <= rd_cnt == 7'd65  ;
+        s_m_data_last[1]  <= s_m_data_last[0] ;
+        s_m_data_user[0]  <= (raddr[0] == wlen) && (rd_cnt == 7'd65);
+        s_m_data_user[1]  <= s_m_data_user[0];
+    end
+end
+
+assign m_data       = s_m_data         ;
+assign m_data_valid = s_m_data_valid[1];
+assign m_data_last  = s_m_data_last[1] ;
+assign m_data_user  = s_m_data_user[1] ;
+assign m_data_end   = s_m_data_user[1] ;
 
 generate
     for (i = 0; i < 8; i = i+1) begin : LOOP_MEM
