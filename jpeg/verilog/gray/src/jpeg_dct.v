@@ -126,8 +126,10 @@ reg [7:0] pipe_0 [7:0];
 reg [2:0] index_i;
 reg [2:0] index_j;
 
-reg [5:0] s_data_valid_ff; 
-reg [5:0] s_data_last_ff ; 
+reg s_data_valid_ff; 
+reg s_data_last_ff ; 
+
+reg [67:0] s_data_fire;  
 
 reg [20:0] pipe_1 [7:0];
 reg [21:0] pipe_2 [3:0];
@@ -135,7 +137,10 @@ reg [22:0] pipe_3 [1:0];
 reg [23:0] pipe_4      ;
 reg [15:0] pipe_5      ;
 
-reg [15:0] dct_1d_mem [127:0];
+reg [15:0] dct_1d_mem [112:0];
+reg dct_1d_cnt_valid;
+reg [5:0] dct_1d_cnt;
+reg [15:0] dct_1d [7:0];
 
 generate
     for (i = 0; i < 8; i = i + 1) begin : LOOP_MINUS_128
@@ -147,12 +152,17 @@ endgenerate
 
 always @(posedge clk ) begin
     if(rst)begin
-        s_data_valid_ff <= 6'd0;
-        s_data_last_ff  <= 6'd0;
+        s_data_valid_ff <= 1'd0;
+        s_data_last_ff  <= 1'd0;
+        s_data_fire     <= 68'd0;
     end
     else begin
-        s_data_valid_ff <= {s_data_valid_ff[4:0], s_data_valid};
-        s_data_last_ff  <= {s_data_last_ff [4:0], s_data_last };
+        s_data_valid_ff <= s_data_valid;
+        s_data_last_ff  <= s_data_last ;
+        
+        s_data_fire[0]  <= s_data_valid_ff & s_data_last_ff;
+       
+        s_data_fire[67:1] <= s_data_fire[66:0];
     end
 end
 
@@ -193,11 +203,134 @@ always @(posedge clk ) begin
 end
 
 generate
-    for (i = 0; i < 127; i = i+1) begin : LOOP_DCT_1D
+    for (i = 0; i < 112; i = i+1) begin : LOOP_DCT_1D
         always @(posedge clk ) begin
             dct_1d_mem[i+1] <= dct_1d_mem[i];
         end
     end
 endgenerate
+
+always @(posedge clk ) begin
+    if(rst)begin
+        dct_1d_cnt_valid <= 1'b0;
+    end
+    else begin
+        if(s_data_fire[67])begin
+            dct_1d_cnt_valid <= 1'b1;
+        end
+        else if(&dct_1d_cnt)begin
+            dct_1d_cnt_valid <= 1'b0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        dct_1d_cnt <= 6'd0;
+    end
+    else begin
+        if(dct_1d_cnt_valid)begin
+            dct_1d_cnt <= dct_1d_cnt + 6'd1;
+        end
+        else begin
+            dct_1d_cnt <= 6'd0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    case (dct_1d_cnt)
+        6'd0: begin
+            dct_1d[0] <= dct_1d_mem[63];
+            dct_1d[1] <= dct_1d_mem[55];
+            dct_1d[2] <= dct_1d_mem[47];
+            dct_1d[3] <= dct_1d_mem[39];
+            dct_1d[4] <= dct_1d_mem[31];
+            dct_1d[5] <= dct_1d_mem[23];
+            dct_1d[6] <= dct_1d_mem[15];
+            dct_1d[7] <= dct_1d_mem[ 7];
+        end
+        6'd8: begin
+            dct_1d[0] <= dct_1d_mem[70];
+            dct_1d[1] <= dct_1d_mem[62];
+            dct_1d[2] <= dct_1d_mem[54];
+            dct_1d[3] <= dct_1d_mem[46];
+            dct_1d[4] <= dct_1d_mem[38];
+            dct_1d[5] <= dct_1d_mem[30];
+            dct_1d[6] <= dct_1d_mem[22];
+            dct_1d[7] <= dct_1d_mem[14];
+        end
+        6'd16: begin
+            dct_1d[0] <= dct_1d_mem[77];
+            dct_1d[1] <= dct_1d_mem[69];
+            dct_1d[2] <= dct_1d_mem[61];
+            dct_1d[3] <= dct_1d_mem[53];
+            dct_1d[4] <= dct_1d_mem[45];
+            dct_1d[5] <= dct_1d_mem[37];
+            dct_1d[6] <= dct_1d_mem[29];
+            dct_1d[7] <= dct_1d_mem[21];
+        end
+        6'd24: begin
+            dct_1d[0] <= dct_1d_mem[84];
+            dct_1d[1] <= dct_1d_mem[76];
+            dct_1d[2] <= dct_1d_mem[68];
+            dct_1d[3] <= dct_1d_mem[60];
+            dct_1d[4] <= dct_1d_mem[52];
+            dct_1d[5] <= dct_1d_mem[44];
+            dct_1d[6] <= dct_1d_mem[36];
+            dct_1d[7] <= dct_1d_mem[28];
+        end
+        6'd32: begin
+            dct_1d[0] <= dct_1d_mem[91];
+            dct_1d[1] <= dct_1d_mem[83];
+            dct_1d[2] <= dct_1d_mem[75];
+            dct_1d[3] <= dct_1d_mem[67];
+            dct_1d[4] <= dct_1d_mem[59];
+            dct_1d[5] <= dct_1d_mem[51];
+            dct_1d[6] <= dct_1d_mem[43];
+            dct_1d[7] <= dct_1d_mem[35];
+        end
+        6'd40: begin
+            dct_1d[0] <= dct_1d_mem[98];
+            dct_1d[1] <= dct_1d_mem[90];
+            dct_1d[2] <= dct_1d_mem[82];
+            dct_1d[3] <= dct_1d_mem[74];
+            dct_1d[4] <= dct_1d_mem[66];
+            dct_1d[5] <= dct_1d_mem[58];
+            dct_1d[6] <= dct_1d_mem[50];
+            dct_1d[7] <= dct_1d_mem[42];
+        end
+        6'd48: begin
+            dct_1d[0] <= dct_1d_mem[105];
+            dct_1d[1] <= dct_1d_mem[97];
+            dct_1d[2] <= dct_1d_mem[89];
+            dct_1d[3] <= dct_1d_mem[81];
+            dct_1d[4] <= dct_1d_mem[73];
+            dct_1d[5] <= dct_1d_mem[65];
+            dct_1d[6] <= dct_1d_mem[57];
+            dct_1d[7] <= dct_1d_mem[49];
+        end
+        6'd56: begin
+            dct_1d[0] <= dct_1d_mem[112];
+            dct_1d[1] <= dct_1d_mem[104];
+            dct_1d[2] <= dct_1d_mem[96];
+            dct_1d[3] <= dct_1d_mem[88];
+            dct_1d[4] <= dct_1d_mem[80];
+            dct_1d[5] <= dct_1d_mem[72];
+            dct_1d[6] <= dct_1d_mem[64];
+            dct_1d[7] <= dct_1d_mem[56];
+        end
+        default: begin
+            dct_1d[0] <= dct_1d[0];
+            dct_1d[1] <= dct_1d[1];
+            dct_1d[2] <= dct_1d[2];
+            dct_1d[3] <= dct_1d[3];
+            dct_1d[4] <= dct_1d[4];
+            dct_1d[5] <= dct_1d[5];
+            dct_1d[6] <= dct_1d[6];
+            dct_1d[7] <= dct_1d[7];
+        end 
+    endcase
+end
     
 endmodule
