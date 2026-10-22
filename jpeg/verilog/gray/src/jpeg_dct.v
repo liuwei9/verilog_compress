@@ -131,16 +131,23 @@ reg s_data_last_ff ;
 
 reg [67:0] s_data_fire;  
 
-reg [20:0] pipe_1 [7:0];
-reg [21:0] pipe_2 [3:0];
-reg [22:0] pipe_3 [1:0];
-reg [23:0] pipe_4      ;
-reg [15:0] pipe_5      ;
+reg [20:0] dct_1d_pipe_1 [7:0];
+reg [21:0] dct_1d_pipe_2 [3:0];
+reg [22:0] dct_1d_pipe_3 [1:0];
+reg [23:0] dct_1d_pipe_4      ;
+reg [11:0] dct_1d_pipe_5      ;
 
-reg [15:0] dct_1d_mem [112:0];
+reg [11:0] dct_1d_mem [112:0];
 reg dct_1d_cnt_valid;
 reg [5:0] dct_1d_cnt;
-reg [15:0] dct_1d [7:0];
+reg [11:0] dct_1d [7:0];
+reg dct_1d_valid;
+
+reg [24:0] dct_2d_pipe_1 [7:0];
+reg [25:0] dct_2d_pipe_2 [3:0];
+reg [26:0] dct_2d_pipe_3 [1:0];
+reg [27:0] dct_2d_pipe_4;
+reg [10:0] dct_2d_pipe_5;
 
 generate
     for (i = 0; i < 8; i = i + 1) begin : LOOP_MINUS_128
@@ -180,26 +187,37 @@ end
 generate
     for (i = 0; i < 8; i = i + 1) begin : LOOP_PIPE1
         always @(posedge clk ) begin
-            pipe_1[i] <= $signed(pipe_0[i]) * $signed(cos_rom[index_i][i]);
+            dct_1d_pipe_1[i] <= $signed(pipe_0[i]) * $signed(cos_rom[index_i][i]);
         end
     end
 endgenerate
 
 always @(posedge clk ) begin
-    pipe_2[0] <= $signed(pipe_1[0]) + $signed(pipe_1[1]);
-    pipe_2[1] <= $signed(pipe_1[2]) + $signed(pipe_1[3]);
-    pipe_2[2] <= $signed(pipe_1[4]) + $signed(pipe_1[5]);
-    pipe_2[3] <= $signed(pipe_1[6]) + $signed(pipe_1[7]);
+    dct_1d_pipe_2[0] <= $signed(dct_1d_pipe_1[0]) + $signed(dct_1d_pipe_1[1]);
+    dct_1d_pipe_2[1] <= $signed(dct_1d_pipe_1[2]) + $signed(dct_1d_pipe_1[3]);
+    dct_1d_pipe_2[2] <= $signed(dct_1d_pipe_1[4]) + $signed(dct_1d_pipe_1[5]);
+    dct_1d_pipe_2[3] <= $signed(dct_1d_pipe_1[6]) + $signed(dct_1d_pipe_1[7]);
 
-    pipe_3[0] <= $signed(pipe_2[0]) + $signed(pipe_2[1]);
-    pipe_3[1] <= $signed(pipe_2[2]) + $signed(pipe_2[3]);
+    dct_1d_pipe_3[0] <= $signed(dct_1d_pipe_2[0]) + $signed(dct_1d_pipe_2[1]);
+    dct_1d_pipe_3[1] <= $signed(dct_1d_pipe_2[2]) + $signed(dct_1d_pipe_2[3]);
 
-    pipe_4    <= $signed(pipe_3[0]) + $signed(pipe_3[1]);
-    pipe_5    <= pipe_4[23:8];
+    dct_1d_pipe_4    <= $signed(dct_1d_pipe_3[0]) + $signed(dct_1d_pipe_3[1]);  
 end
 
 always @(posedge clk ) begin
-    dct_1d_mem[0] <= pipe_5;
+    if($signed(dct_1d_pipe_4[24:12]) > 13'sd2047)begin
+        dct_1d_pipe_5 <= 12'd2047;
+    end
+    else if($signed(dct_1d_pipe_4[24:12] < -13'sd2048))begin
+        dct_1d_pipe_5 <= -12'sd2048;
+    end
+    else begin
+        dct_1d_pipe_5 <= dct_1d_pipe_4[23:12];
+    end
+end
+
+always @(posedge clk ) begin
+    dct_1d_mem[0] <= dct_1d_pipe_5;
 end
 
 generate
@@ -235,6 +253,15 @@ always @(posedge clk ) begin
         else begin
             dct_1d_cnt <= 6'd0;
         end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        dct_1d_valid <= 1'b0;
+    end
+    else begin
+        dct_1d_valid <= dct_1d_cnt_valid;
     end
 end
 
@@ -332,5 +359,50 @@ always @(posedge clk ) begin
         end 
     endcase
 end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        index_j <= 3'd0;
+    end
+    else begin
+        if(dct_1d_valid)begin
+            index_j <= index_j + 3'd1;
+        end
+    end
+end
+
+generate
+    for (i = 0; i < 8; i = i + 1) begin : LOOP_DCT_2D_PIPE0
+        always @(posedge clk ) begin
+            dct_2d_pipe_1[i] <= $signed(dct_1d[i]) * $signed(cos_rom[index_j][i]);
+        end
+    end
+endgenerate
+
+always @(posedge clk ) begin
+    dct_2d_pipe_2[0] <= $signed(dct_2d_pipe_1[0]) + $signed(dct_2d_pipe_1[1]);
+    dct_2d_pipe_2[1] <= $signed(dct_2d_pipe_1[2]) + $signed(dct_2d_pipe_1[3]);
+    dct_2d_pipe_2[2] <= $signed(dct_2d_pipe_1[4]) + $signed(dct_2d_pipe_1[5]);
+    dct_2d_pipe_2[3] <= $signed(dct_2d_pipe_1[6]) + $signed(dct_2d_pipe_1[7]);
+
+    dct_2d_pipe_3[0] <= $signed(dct_2d_pipe_2[0]) + $signed(dct_2d_pipe_2[1]);
+    dct_2d_pipe_3[1] <= $signed(dct_2d_pipe_2[2]) + $signed(dct_2d_pipe_2[3]);
+
+    dct_2d_pipe_4    <= $signed(dct_2d_pipe_3[0]) + $signed(dct_2d_pipe_3[1]);  
+end
+
+always @(posedge clk ) begin
+    if($signed(dct_2d_pipe_4[23:12]) > 12'sd1023)begin
+        dct_2d_pipe_5 <= 11'd1023;
+    end
+    else if($signed(dct_2d_pipe_4[23:12] < -13'sd1024))begin
+        dct_2d_pipe_5 <= -11'sd1024;
+    end
+    else begin
+        dct_2d_pipe_5 <= dct_2d_pipe_4[22:12];
+    end
+end
+
+
     
 endmodule
