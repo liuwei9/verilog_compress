@@ -5,7 +5,6 @@ module jpeg_head (
     input [15:0]   cfg_img_h           ,
     input [15:0]   cfg_img_w           ,
     input [6:0]    cfg_quality         , 
-    input [31:0]   cfg_img_addr        ,
     input          jpeg_start          ,
 
     output         quant_lum_ren       ,

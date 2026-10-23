@@ -10,7 +10,6 @@ module jpeg_top #(
     input [15:0]   cfg_img_h        ,
     input [15:0]   cfg_img_w        ,
     input [6:0]    cfg_quality      , 
-    input [31:0]   cfg_img_addr     ,
     input          jpeg_start       ,
 
     input [63:0]   s_data           ,
@@ -18,11 +17,6 @@ module jpeg_top #(
     input          s_data_valid     ,
     input          s_data_last      ,
     output         s_data_ready     ,
-
-    output [31:0]  s_cmd_addr       ,
-    output [31:0]  s_cmd_len        ,
-    output         s_cmd_valid      ,
-    input          s_cmd_ready      ,
 
     output [63:0]  m_data           ,
     output [ 7:0]  m_data_keep      ,
@@ -87,7 +81,6 @@ jpeg_head jpeg_head_inst(
     .cfg_img_h           (cfg_img_h           ),
     .cfg_img_w           (cfg_img_w           ),
     .cfg_quality         (cfg_quality         ), 
-    .cfg_img_addr        (cfg_img_addr        ),
     .jpeg_start          (jpeg_start          ),
 
     .quant_lum_ren       (quant_lum_ren       ),
@@ -125,7 +118,6 @@ jpeg_in_buf_top #(
 
     .cfg_img_h        (cfg_img_h   ),
     .cfg_img_w        (cfg_img_w   ),
-    .cfg_img_addr     (cfg_img_addr),
     .jpeg_start       (jpeg_start  ),
 
     .s_data           (s_data      ),
@@ -133,11 +125,6 @@ jpeg_in_buf_top #(
     .s_data_valid     (s_data_valid),
     .s_data_last      (s_data_last ),
     .s_data_ready     (s_data_ready),
-
-    .s_cmd_addr       (s_cmd_addr  ),
-    .s_cmd_len        (s_cmd_len   ),
-    .s_cmd_valid      (s_cmd_valid ),
-    .s_cmd_ready      (s_cmd_ready ),
 
     .m_data           (in_buf_m_data      ),
     .m_data_valid     (in_buf_m_data_valid),

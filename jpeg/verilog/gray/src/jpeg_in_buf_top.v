@@ -7,7 +7,6 @@ module jpeg_in_buf_top #(
 
     input [$clog2(IMG_H) - 1 : 0]   cfg_img_h        ,
     input [$clog2(IMG_W) - 1 : 0]   cfg_img_w        ,
-    input [31:0]                    cfg_img_addr     ,
     input                           jpeg_start       ,
 
     input [63:0]                    s_data           ,
@@ -15,11 +14,6 @@ module jpeg_in_buf_top #(
     input                           s_data_valid     ,
     input                           s_data_last      ,
     output                          s_data_ready     ,
-
-    output [31:0]                   s_cmd_addr       ,
-    output [31:0]                   s_cmd_len        ,
-    output                          s_cmd_valid      ,
-    input                           s_cmd_ready      ,
 
     output [63:0]                   m_data           ,
     output                          m_data_valid     ,
@@ -65,7 +59,6 @@ jpeg_in_buf_ctrl #(
 
     .cfg_img_h         (cfg_img_h        ),
     .cfg_img_w         (cfg_img_w        ),
-    .cfg_img_addr      (cfg_img_addr     ),
     .jpeg_start        (jpeg_start       ),
 
     .s_data            (s_data           ),
@@ -73,11 +66,6 @@ jpeg_in_buf_ctrl #(
     .s_data_valid      (s_data_valid     ),
     .s_data_last       (s_data_last      ),
     .s_data_ready      (s_data_ready     ),
-
-    .s_cmd_addr        (s_cmd_addr       ),
-    .s_cmd_len         (s_cmd_len        ),
-    .s_cmd_valid       (s_cmd_valid      ),
-    .s_cmd_ready       (s_cmd_ready      ),
 
     .m_data            (m_data           ),
     .m_data_valid      (m_data_valid     ),

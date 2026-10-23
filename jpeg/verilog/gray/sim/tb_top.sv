@@ -12,17 +12,12 @@ parameter DIV_LUM_PATH   = "E:/jpeg/jpeg_gray_ku5p/user/src/jpeg/common/divLumMa
 logic [15:0]   cfg_img_h    = 720  ;
 logic [15:0]   cfg_img_w    = 1280 ;
 logic [6:0]    cfg_quality  = 10   ;
-logic [31:0]   cfg_img_addr = 32'd0;
 logic          jpeg_start   = 0    ;
 logic [63:0]   s_data         ;
 logic [ 7:0]   s_data_keep    ;
 logic          s_data_valid   ;
 logic          s_data_last    ;
 logic          s_data_ready   ;
-logic  [31:0]  s_cmd_addr     ;
-logic  [31:0]  s_cmd_len      ;
-logic          s_cmd_valid    ;
-logic          s_cmd_ready    ;
 logic  [63:0]  m_data         ;
 logic  [ 7:0]  m_data_keep    ;
 logic          m_data_valid   ;
@@ -68,7 +63,6 @@ jpeg_top #(
     .cfg_img_h        (cfg_img_h        ),
     .cfg_img_w        (cfg_img_w        ),
     .cfg_quality      (cfg_quality      ), 
-    .cfg_img_addr     (cfg_img_addr     ),
     .jpeg_start       (jpeg_start       ),
 
     .s_data           (s_data           ),
@@ -76,11 +70,6 @@ jpeg_top #(
     .s_data_valid     (s_data_valid     ),
     .s_data_last      (s_data_last      ),
     .s_data_ready     (s_data_ready     ),
-
-    .s_cmd_addr       (s_cmd_addr       ),
-    .s_cmd_len        (s_cmd_len        ),
-    .s_cmd_valid      (s_cmd_valid      ),
-    .s_cmd_ready      (s_cmd_ready      ),
 
     .m_data           (m_data           ),
     .m_data_keep      (m_data_keep      ),
@@ -128,7 +117,6 @@ task automatic read_bmp_gray;
     
     s_data_valid <= 1'b0;   
     s_data_last  <= 1'b0;
-    s_cmd_ready  <= 1'b1;
     s_data_keep  <= 8'hff;
     cnt <= 0;
     @(posedge clk);
@@ -137,7 +125,6 @@ task automatic read_bmp_gray;
         s_data_valid <= 1'b0;
         s_data_last  <= 1'b0;
         pix_index = file_len - row_size * (row_cnt + 32'd1);
-        wait(s_cmd_valid & s_cmd_ready);
         @(posedge clk);
         for (col_cnt = 0; col_cnt < col_num; col_cnt++) begin 
             s_data_valid <= (cnt == 7) || (col_cnt == col_num - 1);
