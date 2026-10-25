@@ -18,7 +18,6 @@ module jpeg_in_buf_top #(
     output [63:0]                   m_data           ,
     output                          m_data_valid     ,
     output                          m_data_last      ,
-    output                          m_frame_end      ,
     input                           m_data_req       
 );
 
@@ -70,7 +69,6 @@ jpeg_in_buf_ctrl #(
     .m_data            (m_data           ),
     .m_data_valid      (m_data_valid     ),
     .m_data_last       (m_data_last      ),
-    .m_frame_end       (m_frame_end      ),
     .m_data_req        (m_data_req       ),
 
     .ping_s_data       (ping_s_data      ),

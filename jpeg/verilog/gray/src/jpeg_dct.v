@@ -4,11 +4,9 @@ module jpeg_dct (
 
     input [63:0]  s_data      ,
     input         s_data_valid,
-    input         s_frame_end ,
     input         s_data_last ,
 
     output [25:0] m_data      ,
-    output        m_frame_end ,
     output        m_data_valid,
     output        m_data_last 
 );

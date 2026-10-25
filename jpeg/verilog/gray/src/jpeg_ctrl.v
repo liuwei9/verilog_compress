@@ -13,7 +13,6 @@ module jpeg_ctrl (
     input [3:0]    huffman_s_bits      ,
     input [11:0]   huffman_s_data      ,
     input          huffman_s_data_valid,
-    input          huffman_s_frame_end ,
     input          huffman_s_data_last ,
 
     output [63:0]  m_data              ,
@@ -57,6 +56,7 @@ reg         huffman_data_valid_1;
 
 wire [63:0] huffman_data_reverse;
 
+reg huffman_s_frame_end;
 reg [10:0]   huffman_s_frame_end_ff;
 
 always @(posedge clk ) begin

@@ -39,18 +39,15 @@ wire [17:0]  div_lum_rdata     ;
 wire [63:0] in_buf_m_data      ;
 wire        in_buf_m_data_valid;
 wire        in_buf_m_data_last ;
-wire        in_buf_m_frame_end ;
 wire        in_buf_m_data_req  ;
 
 wire [25:0] dct_m_data         ;
 wire        dct_m_data_valid   ;
-wire        dct_m_frame_end    ;
 wire        dct_m_data_last    ;
 
 wire [11:0] quant_m_data       ;
 wire [5:0]  quant_m_zero_cnt   ;
 wire        quant_m_data_valid ;
-wire        quant_m_frame_end  ;
 wire        quant_m_data_last  ;
 
 wire [7:0]  ac_raddr;
@@ -66,7 +63,6 @@ wire [15:0] huffman_m_code      ;
 wire [3:0]  huffman_m_bits      ;
 wire [11:0] huffman_m_data      ;
 wire        huffman_m_data_valid;
-wire        huffman_m_frame_end ;
 wire        huffman_m_data_last ;
 
 wire [63:0] ctrl_m_data        ;
@@ -129,7 +125,6 @@ jpeg_in_buf_top #(
     .m_data           (in_buf_m_data      ),
     .m_data_valid     (in_buf_m_data_valid),
     .m_data_last      (in_buf_m_data_last ),
-    .m_frame_end      (in_buf_m_frame_end ),
     .m_data_req       (in_buf_m_data_req  )
 );
 
@@ -141,12 +136,10 @@ jpeg_dct jpeg_dct_inst(
 
     .s_data           (in_buf_m_data      ),
     .s_data_valid     (in_buf_m_data_valid),
-    .s_frame_end      (in_buf_m_frame_end ),
     .s_data_last      (in_buf_m_data_last ),
 
     .m_data           (dct_m_data      ),
     .m_data_valid     (dct_m_data_valid),
-    .m_frame_end      (dct_m_frame_end ),
     .m_data_last      (dct_m_data_last )
 );
 
@@ -159,7 +152,6 @@ jpeg_quant jpeg_quant_inst(
 
     .s_data           (dct_m_data         ),
     .s_data_valid     (dct_m_data_valid   ),
-    .s_frame_end      (dct_m_frame_end    ),
     .s_data_last      (dct_m_data_last    ),
 
     .div_lum_ren      (div_lum_ren        ),
@@ -169,7 +161,6 @@ jpeg_quant jpeg_quant_inst(
     .m_data           (quant_m_data       ),
     .m_zero_cnt       (quant_m_zero_cnt   ),
     .m_data_valid     (quant_m_data_valid ),
-    .m_frame_end      (quant_m_frame_end  ),
     .m_data_last      (quant_m_data_last  )
 );
 
@@ -182,7 +173,6 @@ jpeg_huffman jpeg_huffman_inst(
     .s_data           (quant_m_data      ),
     .s_zero_cnt       (quant_m_zero_cnt  ),
     .s_data_valid     (quant_m_data_valid),
-    .s_frame_end      (quant_m_frame_end ),
     .s_data_last      (quant_m_data_last ),
 
     .dc_raddr         (dc_raddr         ),
@@ -198,7 +188,6 @@ jpeg_huffman jpeg_huffman_inst(
     .m_bits           (huffman_m_bits      ),
     .m_data           (huffman_m_data      ),
     .m_data_valid     (huffman_m_data_valid),
-    .m_frame_end      (huffman_m_frame_end ),
     .m_data_last      (huffman_m_data_last ) 
 );
 
@@ -235,7 +224,6 @@ jpeg_ctrl jpeg_ctrl_inst(
     .huffman_s_bits       (huffman_m_bits      ),
     .huffman_s_data       (huffman_m_data      ),
     .huffman_s_data_valid (huffman_m_data_valid),
-    .huffman_s_frame_end  (huffman_m_frame_end ),
     .huffman_s_data_last  (huffman_m_data_last ),
 
     .m_data               (m_data              ),
