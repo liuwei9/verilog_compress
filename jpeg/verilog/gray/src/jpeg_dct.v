@@ -6,7 +6,7 @@ module jpeg_dct (
     input         s_data_valid,
     input         s_data_last ,
 
-    output [25:0] m_data      ,
+    output [10:0] m_data      ,
     output        m_data_valid,
     output        m_data_last 
 );
@@ -224,7 +224,7 @@ reg r_ping;
 reg [5:0] w_addr;
 reg [5:0] r_addr;
 
-reg [25:0] m_data_r      ;
+reg [10:0] m_data_r      ;
 reg        m_frame_end_r ;
 reg        m_data_valid_r;
 reg        m_data_last_r ;
@@ -474,9 +474,9 @@ end
 
 always @(posedge clk ) begin
     if($signed(dct_2d_pipe_4[23:12]) > 12'sd1023)begin
-        dct_2d_pipe_5 <= 11'd1023;
+        dct_2d_pipe_5 <= 11'sd1023;
     end
-    else if($signed(dct_2d_pipe_4[23:12] < -12'sd1024))begin
+    else if($signed(dct_2d_pipe_4[23:12]) < -12'sd1024)begin
         dct_2d_pipe_5 <= -11'sd1024;
     end
     else begin

@@ -5,7 +5,7 @@ module jpeg_quant (
     input [6:0]    cfg_quality      , 
     input          jpeg_start       ,
 
-    input [25:0]   s_data           ,
+    input [10:0]   s_data           ,
     input          s_data_valid     ,
     input          s_data_last      ,
 
@@ -24,7 +24,7 @@ reg [12:0] div_raddr;
 
 reg jpeg_start_ff;
 
-reg [25:0] s_data_ff [3:0];
+reg [10:0] s_data_ff [3:0];
 reg [17:0] div_lum_rdata_ff [1:0];
 reg [43:0] mul_data;
 reg [19:0] round_data;

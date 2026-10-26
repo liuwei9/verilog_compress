@@ -41,7 +41,7 @@ wire        in_buf_m_data_valid;
 wire        in_buf_m_data_last ;
 wire        in_buf_m_data_req  ;
 
-wire [25:0] dct_m_data         ;
+wire [10:0] dct_m_data         ;
 wire        dct_m_data_valid   ;
 wire        dct_m_data_last    ;
 
