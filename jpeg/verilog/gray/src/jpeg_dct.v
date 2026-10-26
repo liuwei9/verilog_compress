@@ -120,68 +120,68 @@ end
 
 initial begin
     zigzag_rom[ 0] <= 6'd0;
-    zigzag_rom[ 1] <= 6'd1;
-    zigzag_rom[ 2] <= 6'd8;
-    zigzag_rom[ 3] <= 6'd16;
-    zigzag_rom[ 4] <= 6'd9;
-    zigzag_rom[ 5] <= 6'd2;
-    zigzag_rom[ 6] <= 6'd3;
-    zigzag_rom[ 7] <= 6'd10;
-    zigzag_rom[ 8] <= 6'd17;
-    zigzag_rom[ 9] <= 6'd24;
-    zigzag_rom[10] <= 6'd32;
-    zigzag_rom[11] <= 6'd25;
-    zigzag_rom[12] <= 6'd18;
-    zigzag_rom[13] <= 6'd11;
-    zigzag_rom[14] <= 6'd4;
-    zigzag_rom[15] <= 6'd5;
-    zigzag_rom[16] <= 6'd12;
-    zigzag_rom[17] <= 6'd19;
-    zigzag_rom[18] <= 6'd26;
-    zigzag_rom[19] <= 6'd33;
-    zigzag_rom[20] <= 6'd40;
-    zigzag_rom[21] <= 6'd48;
-    zigzag_rom[22] <= 6'd41;
-    zigzag_rom[23] <= 6'd34;
-    zigzag_rom[24] <= 6'd27;
-    zigzag_rom[25] <= 6'd20;
-    zigzag_rom[26] <= 6'd13;
-    zigzag_rom[27] <= 6'd6;
-    zigzag_rom[28] <= 6'd7;
-    zigzag_rom[29] <= 6'd14;
-    zigzag_rom[30] <= 6'd21;
-    zigzag_rom[31] <= 6'd28;
-    zigzag_rom[32] <= 6'd35;
-    zigzag_rom[33] <= 6'd42;
-    zigzag_rom[34] <= 6'd49;
-    zigzag_rom[35] <= 6'd56;
-    zigzag_rom[36] <= 6'd57;
-    zigzag_rom[37] <= 6'd50;
-    zigzag_rom[38] <= 6'd43;
-    zigzag_rom[39] <= 6'd36;
-    zigzag_rom[40] <= 6'd29;
-    zigzag_rom[41] <= 6'd22;
-    zigzag_rom[42] <= 6'd15;
-    zigzag_rom[43] <= 6'd23;
-    zigzag_rom[44] <= 6'd30;
-    zigzag_rom[45] <= 6'd37;
-    zigzag_rom[46] <= 6'd44;
-    zigzag_rom[47] <= 6'd51;
-    zigzag_rom[48] <= 6'd58;
-    zigzag_rom[49] <= 6'd59;
-    zigzag_rom[50] <= 6'd52;
-    zigzag_rom[51] <= 6'd45;
-    zigzag_rom[52] <= 6'd38;
-    zigzag_rom[53] <= 6'd31;
-    zigzag_rom[54] <= 6'd39;
-    zigzag_rom[55] <= 6'd46;
-    zigzag_rom[56] <= 6'd53;
-    zigzag_rom[57] <= 6'd60;
-    zigzag_rom[58] <= 6'd61;
-    zigzag_rom[59] <= 6'd54;
-    zigzag_rom[60] <= 6'd47;
-    zigzag_rom[61] <= 6'd55;
-    zigzag_rom[62] <= 6'd62;
+    zigzag_rom[ 1] <= 6'd2;
+    zigzag_rom[ 2] <= 6'd3;
+    zigzag_rom[ 3] <= 6'd9;
+    zigzag_rom[ 4] <= 6'd10;
+    zigzag_rom[ 5] <= 6'd20;
+    zigzag_rom[ 6] <= 6'd21;
+    zigzag_rom[ 7] <= 6'd35;
+    zigzag_rom[ 8] <= 6'd1;
+    zigzag_rom[ 9] <= 6'd4;
+    zigzag_rom[10] <= 6'd8;
+    zigzag_rom[11] <= 6'd11;
+    zigzag_rom[12] <= 6'd19;
+    zigzag_rom[13] <= 6'd22;
+    zigzag_rom[14] <= 6'd34;
+    zigzag_rom[15] <= 6'd36;
+    zigzag_rom[16] <= 6'd5;
+    zigzag_rom[17] <= 6'd7;
+    zigzag_rom[18] <= 6'd12;
+    zigzag_rom[19] <= 6'd18;
+    zigzag_rom[20] <= 6'd23;
+    zigzag_rom[21] <= 6'd33;
+    zigzag_rom[22] <= 6'd37;
+    zigzag_rom[23] <= 6'd48;
+    zigzag_rom[24] <= 6'd6;
+    zigzag_rom[25] <= 6'd13;
+    zigzag_rom[26] <= 6'd17;
+    zigzag_rom[27] <= 6'd24;
+    zigzag_rom[28] <= 6'd32;
+    zigzag_rom[29] <= 6'd38;
+    zigzag_rom[30] <= 6'd47;
+    zigzag_rom[31] <= 6'd49;
+    zigzag_rom[32] <= 6'd14;
+    zigzag_rom[33] <= 6'd16;
+    zigzag_rom[34] <= 6'd25;
+    zigzag_rom[35] <= 6'd31;
+    zigzag_rom[36] <= 6'd39;
+    zigzag_rom[37] <= 6'd46;
+    zigzag_rom[38] <= 6'd50;
+    zigzag_rom[39] <= 6'd57;
+    zigzag_rom[40] <= 6'd15;
+    zigzag_rom[41] <= 6'd26;
+    zigzag_rom[42] <= 6'd30;
+    zigzag_rom[43] <= 6'd40;
+    zigzag_rom[44] <= 6'd45;
+    zigzag_rom[45] <= 6'd51;
+    zigzag_rom[46] <= 6'd56;
+    zigzag_rom[47] <= 6'd58;
+    zigzag_rom[48] <= 6'd27;
+    zigzag_rom[49] <= 6'd29;
+    zigzag_rom[50] <= 6'd41;
+    zigzag_rom[51] <= 6'd44;
+    zigzag_rom[52] <= 6'd52;
+    zigzag_rom[53] <= 6'd55;
+    zigzag_rom[54] <= 6'd59;
+    zigzag_rom[55] <= 6'd62;
+    zigzag_rom[56] <= 6'd28;
+    zigzag_rom[57] <= 6'd42;
+    zigzag_rom[58] <= 6'd43;
+    zigzag_rom[59] <= 6'd53;
+    zigzag_rom[60] <= 6'd54;
+    zigzag_rom[61] <= 6'd60;
+    zigzag_rom[62] <= 6'd61;
     zigzag_rom[63] <= 6'd63;
 end
 
@@ -195,13 +195,13 @@ reg [2:0] index_j;
 reg s_data_valid_ff; 
 reg s_data_last_ff ; 
 
-reg [67:0] s_data_fire;  
+reg [68:0] s_data_fire;  
 
 reg [20:0] dct_1d_pipe_1 [7:0];
 reg [21:0] dct_1d_pipe_2 [3:0];
 reg [22:0] dct_1d_pipe_3 [1:0];
 reg [23:0] dct_1d_pipe_4      ;
-reg [11:0] dct_1d_pipe_5      ;
+reg [12:0] dct_1d_pipe_5      ;
 
 reg [11:0] dct_1d_mem [112:0];
 reg dct_1d_cnt_valid;
@@ -241,7 +241,7 @@ always @(posedge clk ) begin
     if(rst)begin
         s_data_valid_ff <= 1'd0;
         s_data_last_ff  <= 1'd0;
-        s_data_fire     <= 68'd0;
+        s_data_fire     <= 69'd0;
     end
     else begin
         s_data_valid_ff <= s_data_valid;
@@ -249,7 +249,7 @@ always @(posedge clk ) begin
         
         s_data_fire[0]  <= s_data_valid_ff & s_data_last_ff;
        
-        s_data_fire[67:1] <= s_data_fire[66:0];
+        s_data_fire[68:1] <= s_data_fire[67:0];
     end
 end
 
@@ -285,11 +285,19 @@ always @(posedge clk ) begin
 end
 
 always @(posedge clk ) begin
-    dct_1d_pipe_5 <= dct_1d_pipe_4[23:12];
+    dct_1d_pipe_5 <= $signed(dct_1d_pipe_4[23:12]) + $signed({11'd0, dct_1d_pipe_4[11]});
 end
 
 always @(posedge clk ) begin
-    dct_1d_mem[0] <= dct_1d_pipe_5;
+    if($signed(dct_1d_pipe_5) > 13'sd2047)begin
+        dct_1d_mem[0] <= 12'sd2047;
+    end
+    else if($signed(dct_1d_pipe_5) < -13'sd2048)begin
+        dct_1d_mem[0] <= -12'sd2048;
+    end
+    else begin
+        dct_1d_mem[0] <= dct_1d_pipe_5[11:0];
+    end    
 end
 
 generate
@@ -305,7 +313,7 @@ always @(posedge clk ) begin
         dct_1d_cnt_valid <= 1'b0;
     end
     else begin
-        if(s_data_fire[67])begin
+        if(s_data_fire[4])begin
             dct_1d_cnt_valid <= 1'b1;
         end
         else if(&dct_1d_cnt)begin
@@ -347,98 +355,100 @@ always @(posedge clk ) begin
 end
 
 always @(posedge clk ) begin
-    case (dct_1d_cnt)
-        6'd0: begin
-            dct_1d[0] <= dct_1d_mem[63];
-            dct_1d[1] <= dct_1d_mem[55];
-            dct_1d[2] <= dct_1d_mem[47];
-            dct_1d[3] <= dct_1d_mem[39];
-            dct_1d[4] <= dct_1d_mem[31];
-            dct_1d[5] <= dct_1d_mem[23];
-            dct_1d[6] <= dct_1d_mem[15];
-            dct_1d[7] <= dct_1d_mem[ 7];
-        end
-        6'd8: begin
-            dct_1d[0] <= dct_1d_mem[70];
-            dct_1d[1] <= dct_1d_mem[62];
-            dct_1d[2] <= dct_1d_mem[54];
-            dct_1d[3] <= dct_1d_mem[46];
-            dct_1d[4] <= dct_1d_mem[38];
-            dct_1d[5] <= dct_1d_mem[30];
-            dct_1d[6] <= dct_1d_mem[22];
-            dct_1d[7] <= dct_1d_mem[14];
-        end
-        6'd16: begin
-            dct_1d[0] <= dct_1d_mem[77];
-            dct_1d[1] <= dct_1d_mem[69];
-            dct_1d[2] <= dct_1d_mem[61];
-            dct_1d[3] <= dct_1d_mem[53];
-            dct_1d[4] <= dct_1d_mem[45];
-            dct_1d[5] <= dct_1d_mem[37];
-            dct_1d[6] <= dct_1d_mem[29];
-            dct_1d[7] <= dct_1d_mem[21];
-        end
-        6'd24: begin
-            dct_1d[0] <= dct_1d_mem[84];
-            dct_1d[1] <= dct_1d_mem[76];
-            dct_1d[2] <= dct_1d_mem[68];
-            dct_1d[3] <= dct_1d_mem[60];
-            dct_1d[4] <= dct_1d_mem[52];
-            dct_1d[5] <= dct_1d_mem[44];
-            dct_1d[6] <= dct_1d_mem[36];
-            dct_1d[7] <= dct_1d_mem[28];
-        end
-        6'd32: begin
-            dct_1d[0] <= dct_1d_mem[91];
-            dct_1d[1] <= dct_1d_mem[83];
-            dct_1d[2] <= dct_1d_mem[75];
-            dct_1d[3] <= dct_1d_mem[67];
-            dct_1d[4] <= dct_1d_mem[59];
-            dct_1d[5] <= dct_1d_mem[51];
-            dct_1d[6] <= dct_1d_mem[43];
-            dct_1d[7] <= dct_1d_mem[35];
-        end
-        6'd40: begin
-            dct_1d[0] <= dct_1d_mem[98];
-            dct_1d[1] <= dct_1d_mem[90];
-            dct_1d[2] <= dct_1d_mem[82];
-            dct_1d[3] <= dct_1d_mem[74];
-            dct_1d[4] <= dct_1d_mem[66];
-            dct_1d[5] <= dct_1d_mem[58];
-            dct_1d[6] <= dct_1d_mem[50];
-            dct_1d[7] <= dct_1d_mem[42];
-        end
-        6'd48: begin
-            dct_1d[0] <= dct_1d_mem[105];
-            dct_1d[1] <= dct_1d_mem[97];
-            dct_1d[2] <= dct_1d_mem[89];
-            dct_1d[3] <= dct_1d_mem[81];
-            dct_1d[4] <= dct_1d_mem[73];
-            dct_1d[5] <= dct_1d_mem[65];
-            dct_1d[6] <= dct_1d_mem[57];
-            dct_1d[7] <= dct_1d_mem[49];
-        end
-        6'd56: begin
-            dct_1d[0] <= dct_1d_mem[112];
-            dct_1d[1] <= dct_1d_mem[104];
-            dct_1d[2] <= dct_1d_mem[96];
-            dct_1d[3] <= dct_1d_mem[88];
-            dct_1d[4] <= dct_1d_mem[80];
-            dct_1d[5] <= dct_1d_mem[72];
-            dct_1d[6] <= dct_1d_mem[64];
-            dct_1d[7] <= dct_1d_mem[56];
-        end
-        default: begin
-            dct_1d[0] <= dct_1d[0];
-            dct_1d[1] <= dct_1d[1];
-            dct_1d[2] <= dct_1d[2];
-            dct_1d[3] <= dct_1d[3];
-            dct_1d[4] <= dct_1d[4];
-            dct_1d[5] <= dct_1d[5];
-            dct_1d[6] <= dct_1d[6];
-            dct_1d[7] <= dct_1d[7];
-        end 
-    endcase
+    if(dct_1d_cnt_valid)begin
+        case (dct_1d_cnt)
+            6'd0: begin
+                dct_1d[0] <= dct_1d_mem[63];
+                dct_1d[1] <= dct_1d_mem[55];
+                dct_1d[2] <= dct_1d_mem[47];
+                dct_1d[3] <= dct_1d_mem[39];
+                dct_1d[4] <= dct_1d_mem[31];
+                dct_1d[5] <= dct_1d_mem[23];
+                dct_1d[6] <= dct_1d_mem[15];
+                dct_1d[7] <= dct_1d_mem[ 7];
+            end
+            6'd8: begin
+                dct_1d[0] <= dct_1d_mem[70];
+                dct_1d[1] <= dct_1d_mem[62];
+                dct_1d[2] <= dct_1d_mem[54];
+                dct_1d[3] <= dct_1d_mem[46];
+                dct_1d[4] <= dct_1d_mem[38];
+                dct_1d[5] <= dct_1d_mem[30];
+                dct_1d[6] <= dct_1d_mem[22];
+                dct_1d[7] <= dct_1d_mem[14];
+            end
+            6'd16: begin
+                dct_1d[0] <= dct_1d_mem[77];
+                dct_1d[1] <= dct_1d_mem[69];
+                dct_1d[2] <= dct_1d_mem[61];
+                dct_1d[3] <= dct_1d_mem[53];
+                dct_1d[4] <= dct_1d_mem[45];
+                dct_1d[5] <= dct_1d_mem[37];
+                dct_1d[6] <= dct_1d_mem[29];
+                dct_1d[7] <= dct_1d_mem[21];
+            end
+            6'd24: begin
+                dct_1d[0] <= dct_1d_mem[84];
+                dct_1d[1] <= dct_1d_mem[76];
+                dct_1d[2] <= dct_1d_mem[68];
+                dct_1d[3] <= dct_1d_mem[60];
+                dct_1d[4] <= dct_1d_mem[52];
+                dct_1d[5] <= dct_1d_mem[44];
+                dct_1d[6] <= dct_1d_mem[36];
+                dct_1d[7] <= dct_1d_mem[28];
+            end
+            6'd32: begin
+                dct_1d[0] <= dct_1d_mem[91];
+                dct_1d[1] <= dct_1d_mem[83];
+                dct_1d[2] <= dct_1d_mem[75];
+                dct_1d[3] <= dct_1d_mem[67];
+                dct_1d[4] <= dct_1d_mem[59];
+                dct_1d[5] <= dct_1d_mem[51];
+                dct_1d[6] <= dct_1d_mem[43];
+                dct_1d[7] <= dct_1d_mem[35];
+            end
+            6'd40: begin
+                dct_1d[0] <= dct_1d_mem[98];
+                dct_1d[1] <= dct_1d_mem[90];
+                dct_1d[2] <= dct_1d_mem[82];
+                dct_1d[3] <= dct_1d_mem[74];
+                dct_1d[4] <= dct_1d_mem[66];
+                dct_1d[5] <= dct_1d_mem[58];
+                dct_1d[6] <= dct_1d_mem[50];
+                dct_1d[7] <= dct_1d_mem[42];
+            end
+            6'd48: begin
+                dct_1d[0] <= dct_1d_mem[105];
+                dct_1d[1] <= dct_1d_mem[97];
+                dct_1d[2] <= dct_1d_mem[89];
+                dct_1d[3] <= dct_1d_mem[81];
+                dct_1d[4] <= dct_1d_mem[73];
+                dct_1d[5] <= dct_1d_mem[65];
+                dct_1d[6] <= dct_1d_mem[57];
+                dct_1d[7] <= dct_1d_mem[49];
+            end
+            6'd56: begin
+                dct_1d[0] <= dct_1d_mem[112];
+                dct_1d[1] <= dct_1d_mem[104];
+                dct_1d[2] <= dct_1d_mem[96];
+                dct_1d[3] <= dct_1d_mem[88];
+                dct_1d[4] <= dct_1d_mem[80];
+                dct_1d[5] <= dct_1d_mem[72];
+                dct_1d[6] <= dct_1d_mem[64];
+                dct_1d[7] <= dct_1d_mem[56];
+            end
+            default: begin
+                dct_1d[0] <= dct_1d[0];
+                dct_1d[1] <= dct_1d[1];
+                dct_1d[2] <= dct_1d[2];
+                dct_1d[3] <= dct_1d[3];
+                dct_1d[4] <= dct_1d[4];
+                dct_1d[5] <= dct_1d[5];
+                dct_1d[6] <= dct_1d[6];
+                dct_1d[7] <= dct_1d[7];
+            end 
+        endcase
+    end   
 end
 
 always @(posedge clk ) begin
@@ -473,10 +483,10 @@ always @(posedge clk ) begin
 end
 
 always @(posedge clk ) begin
-    if($signed(dct_2d_pipe_4[23:12]) > 12'sd1023)begin
+    if($signed(dct_2d_pipe_4[23:12]) >= 12'sd1023)begin
         dct_2d_pipe_5 <= 11'sd1023;
     end
-    else if($signed(dct_2d_pipe_4[23:12]) < -12'sd1024)begin
+    else if($signed(dct_2d_pipe_4[23:12]) <= -12'sd1024)begin
         dct_2d_pipe_5 <= -11'sd1024;
     end
     else begin
@@ -508,13 +518,13 @@ end
 
 always @(posedge clk ) begin
     if(!w_ping)begin
-        dct_2d_mem_ping[w_addr] <= dct_2d_pipe_5;
+        dct_2d_mem_ping[zigzag_rom[w_addr]] <= dct_2d_pipe_5;
     end    
 end
 
 always @(posedge clk ) begin
     if(w_ping)begin
-        dct_2d_mem_pang[w_addr] <= dct_2d_pipe_5;
+        dct_2d_mem_pang[zigzag_rom[w_addr]] <= dct_2d_pipe_5;
     end    
 end
 
@@ -543,10 +553,10 @@ end
 
 always @(posedge clk ) begin
     if(r_ping)begin
-        m_data_r <= dct_2d_mem_pang[zigzag_rom[r_addr]];
+        m_data_r <= dct_2d_mem_pang[r_addr];
     end
     else begin
-        m_data_r <= dct_2d_mem_ping[zigzag_rom[r_addr]];
+        m_data_r <= dct_2d_mem_ping[r_addr];
     end
 end
 
