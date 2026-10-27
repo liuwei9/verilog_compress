@@ -164,12 +164,15 @@ always @(posedge clk ) begin
         last_data <= 1'b0;
     end
     else begin
-        if(fifo_m_valid & fifo_m_ready)begin
-            if(t_data_last & ((t_data == 12'd0) || (t_zero_cnt < 6'd16)))begin
-                last_data <= 1'b1;
-            end
+        // if(fifo_m_valid & fifo_m_ready)begin
+        //     if(t_data_last & ((t_data == 12'd0) || (t_zero_cnt < 6'd16)))begin
+        //         last_data <= 1'b1;
+        //     end
+        // end
+        if(fifo_m_valid & fifo_m_ready &t_data_last & ((t_data == 12'd0) || (t_zero_cnt < 6'd16)))begin
+            last_data <= 1'b1;
         end
-        else if(last_flag & (zero_cnt < 6'd32))begin
+        else if(last_flag & (zero_cnt < 6'd32) & (zero_cnt >= 6'd16))begin
             last_data <= 1'b1;
         end
         else begin

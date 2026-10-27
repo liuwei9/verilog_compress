@@ -214,6 +214,8 @@ jpeg_ctrl jpeg_ctrl_inst(
     .rst                  (rst                 ),
 
     .jpeg_start           (jpeg_start          ),
+    .cfg_img_h            (cfg_img_h           ), 
+    .cfg_img_w            (cfg_img_w           ), 
 
     .jpeg_head_data       (jpeg_head_data      ),
     .jpeg_head_data_valid (jpeg_head_data_valid),

@@ -3,6 +3,8 @@ module jpeg_ctrl (
     input          rst                 ,
 
     input          jpeg_start          ,
+    input [15:0]   cfg_img_h           ,
+    input [15:0]   cfg_img_w           ,
 
     input [7:0]    jpeg_head_data      ,
     input          jpeg_head_data_valid,
@@ -56,8 +58,63 @@ reg         huffman_data_valid_1;
 
 wire [63:0] huffman_data_reverse;
 
-reg huffman_s_frame_end;
+reg huffman_s_frame_end_flag;
+wire huffman_s_frame_end;
 reg [10:0]   huffman_s_frame_end_ff;
+
+reg [15:0]   img_h_num;
+reg [15:0]   img_w_num;
+reg [15:0]   img_h_cnt;
+reg [15:0]   img_w_cnt;
+
+always @(posedge clk ) begin
+    img_h_num <= cfg_img_h[15:3] + (|cfg_img_h[2:0]);
+    img_w_num <= cfg_img_w[15:3] + (|cfg_img_w[2:0]);
+end
+always @(posedge clk ) begin
+    if(rst)begin
+        img_w_cnt <= 16'd1;
+    end
+    else begin
+        if(huffman_s_data_valid & huffman_s_data_last)begin
+            if(img_w_cnt == img_w_num)begin
+                img_w_cnt <= 16'd1;
+            end
+            else begin
+                img_w_cnt <= img_w_cnt + 16'd1;
+            end
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        img_h_cnt <= 16'd1;
+    end
+    else begin
+        if(huffman_s_data_valid & huffman_s_data_last)begin
+            if(img_w_cnt == img_w_num)begin
+                if(img_h_num == img_h_cnt)begin
+                    img_h_cnt <= 16'd1;
+                end
+                else begin
+                    img_h_cnt <= img_h_cnt + 16'd1;
+                end
+            end
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_s_frame_end_flag <= 1'b0;
+    end
+    else begin
+        huffman_s_frame_end_flag <= (img_h_cnt == img_h_num) && (img_w_cnt == img_w_num);
+    end
+end
+
+assign huffman_s_frame_end = huffman_s_frame_end_flag && (huffman_s_data_valid & huffman_s_data_last);
 
 always @(posedge clk ) begin
     if(rst)begin
