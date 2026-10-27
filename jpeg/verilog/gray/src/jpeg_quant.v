@@ -26,8 +26,8 @@ reg jpeg_start_ff;
 
 reg [10:0] s_data_ff [3:0];
 reg [17:0] div_lum_rdata_ff [1:0];
-reg [43:0] mul_data;
-reg [19:0] round_data;
+reg [28:0] mul_data;
+reg [11:0] round_data;
 
 reg [6:0] s_data_valid_ff;
 reg [6:0] s_data_last_ff ;
@@ -99,7 +99,7 @@ end
 
 always @(posedge clk ) begin
     mul_data   <= $signed(div_lum_rdata_ff[1]) * $signed(s_data_ff[3]);
-    round_data <= $signed(mul_data[43:24]) + $signed({19'd0, mul_data[23]});
+    round_data <= $signed(mul_data[27:16]) + $signed({11'd0, mul_data[15]});
     // round_data <= test_mem[addr];
 end
 
