@@ -149,6 +149,9 @@ always @(posedge clk ) begin
         else if(s_data_valid_ff[1] & s_data_last_ff[1])begin
             waddr <= {{DP_W}{1'b0}};
         end
+        else if(curr_state == WAIT)begin
+            waddr <= {{DP_W}{1'b0}};
+        end
     end
 end
 
