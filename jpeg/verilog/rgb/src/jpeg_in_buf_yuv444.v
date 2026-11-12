@@ -14,7 +14,7 @@
     output [63:0]                   m_data      ,
     output                          m_data_valid,
     output                          m_data_last ,
-    output                          m_data_user ,
+    output [1:0]                    m_data_user , //0->Y, 1->cb, 2->cr
     output                          m_data_end  
 );
 
@@ -65,7 +65,7 @@ reg [7:0] m_last_ff ;
 reg [63:0] m_data_r      ;
 reg        m_data_valid_r;
 reg        m_data_last_r ;
-reg        m_data_user_r ;
+reg [1:0]  m_data_user_r ;
 reg        m_data_end_r  ;
 
 
