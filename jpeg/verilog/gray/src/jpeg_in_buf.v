@@ -26,13 +26,14 @@ localparam DP = (IMG_W + 7) / 8;
 
 localparam DP_W = $clog2(DP);
 
-localparam WRITE   = 3'b001;
-localparam WAIT    = 3'b010;
-localparam READ    = 3'b100;
+localparam IDLE    = 4'b0001;
+localparam WRITE   = 4'b0010;
+localparam WAIT    = 4'b0100;
+localparam READ    = 4'b1000;
 
 
-reg [2:0] curr_state;
-reg [2:0] next_state;
+reg [3:0] curr_state;
+reg [3:0] next_state;
 
 reg [1:0] s_data_valid_ff;
 reg [1:0] s_data_last_ff ;
@@ -54,9 +55,11 @@ reg [ 1:0] s_m_data_last ;
 reg [ 1:0] s_m_data_user ;
 reg [ 1:0] s_m_data_end  ;
 
+reg s_data_ready_r;
+
 always @(posedge clk ) begin
     if(rst)begin
-        curr_state <= WRITE;
+        curr_state <= IDLE;
     end
     else begin
         curr_state <= next_state;
@@ -65,6 +68,9 @@ end
 
 always @(*) begin
     case (curr_state)
+        IDLE: begin
+            next_state = WRITE;
+        end
         WRITE: begin
             if((s_data_valid_ff[0] & s_data_last_ff[0] & (wcnt == 3'd0)) | s_data_done)begin
                 next_state = WAIT;
@@ -83,19 +89,31 @@ always @(*) begin
         end
         READ: begin
             if(s_m_data_user[0])begin
-                next_state = WRITE;
+                next_state = IDLE;
             end
             else begin
                 next_state = READ ;
             end
         end
         default: begin
-            next_state = WRITE;
+            next_state = IDLE;
         end
     endcase
 end
 
-assign s_data_ready = (curr_state == WRITE);
+always @(posedge clk ) begin
+    if(rst)begin
+        s_data_ready_r <= 1'b0;
+    end
+    else if(curr_state == IDLE)begin
+        s_data_ready_r <= 1'b1;
+    end
+    else if((curr_state == WRITE) && (((s_data_valid & s_data_last) && (wcnt == 3'b111)) || s_data_done))begin
+        s_data_ready_r <= 1'b0;
+    end
+end
+
+assign s_data_ready = s_data_ready_r;
 
 always @(posedge clk ) begin
     if(rst)begin
@@ -160,7 +178,7 @@ always @(posedge clk ) begin
         wlen <= {{DP_W}{1'b0}};
     end
     else if(s_data_valid_ff[1] & s_data_last_ff[1])begin
-        wlen <= waddr;
+        wlen <= {waddr[(DP_W - 1) : 3], 3'b000} + ({|waddr[2:0], 3'b000});
     end
 end
 
