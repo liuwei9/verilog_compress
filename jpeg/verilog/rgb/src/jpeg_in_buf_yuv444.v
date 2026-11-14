@@ -15,7 +15,8 @@
     output                          m_data_valid,
     output                          m_data_last ,
     output [1:0]                    m_data_user , //0->Y, 1->cb, 2->cr
-    output                          m_data_end  
+    output                          m_data_end  ,
+    input                           m_data_req  
 );
 
 /*
@@ -28,10 +29,23 @@ Cb=-11058R-21710G+32768B+8388608
 Cr=32768R-27439G-5329B+8388608
 */
 
+genvar i;
+localparam DP   = IMG_W;
+localparam DP_W = $clog2(DP);
+
+localparam IDLE    = 4'b0001;
+localparam WRITE   = 4'b0010;
+localparam WAIT    = 4'b0100;
+localparam READ    = 4'b1000;
+
+
+reg [3:0] curr_state;
+reg [3:0] next_state;
+
 reg [23:0] pipe0_1 [6:0];
 reg [9:0]  pipe0_2 [1:0];
 reg [24:0] pipe1_1 [2:0];
-reg [9:0]  pipe1_2 [2:0];
+reg [9:0]  pipe1_2 [1:0];
 reg [23:0] pipe1_3;
 reg [25:0] pipe2   [2:0];
 reg [7:0]  pipe3   [2:0];
@@ -51,22 +65,25 @@ reg [1:0] ren_ff;
 reg [63:0] rdata_t [7:0];
 
 reg [5:0] rd_cnt;
-reg [5:0] rd_cnt_ff [1:0];
+reg [5:0] rd_cnt_ff [3:0];
 reg [1:0] r_time;
-reg [1:0] r_time_ff;
+reg [1:0] r_time_ff [11:0];
 reg       r_row_last;
 reg [1:0] r_row_last_ff;
 
 reg m_valid;
 reg m_last ;
-reg [7:0] m_valid_ff;
-reg [7:0] m_last_ff ;
+reg [10:0] m_valid_ff;
+reg [9:0]  m_last_ff ;
+reg [9:0]  m_end_ff  ;
+reg [9:0]  m_user_ff ;
 
 reg [63:0] m_data_r      ;
 reg        m_data_valid_r;
 reg        m_data_last_r ;
-reg [1:0]  m_data_user_r ;
 reg        m_data_end_r  ;
+
+reg s_data_ready_r;
 
 
 always @(posedge clk ) begin
@@ -135,25 +152,14 @@ always @(posedge clk ) begin
         s_data_last_ff  <= 5'd0;
     end
     else begin
-        s_data_valid_ff <= {s_data_valid_ff[3:0], s_data_valid};
+        s_data_valid_ff <= {s_data_valid_ff[3:0], s_data_valid & s_data_ready};
         s_data_last_ff  <= {s_data_last_ff [3:0], s_data_last };
     end
 end
 
-genvar i;
-localparam DP   = IMG_W;
-localparam DP_W = $clog2(DP);
-
-localparam WRITE   = 2'b01;
-localparam READ    = 2'b10;
-
-
-reg [2:0] curr_state;
-reg [2:0] next_state;
-
 always @(posedge clk ) begin
     if(rst)begin
-        curr_state <= WRITE;
+        curr_state <= IDLE;
     end
     else begin
         curr_state <= next_state;
@@ -162,24 +168,52 @@ end
 
 always @(*) begin
     case (curr_state)
+        IDLE: begin
+            next_state = WRITE;
+        end
         WRITE: begin
             if((s_data_valid_ff[4] & s_data_last_ff[4] & (wcnt == 3'd0)) | s_data_done)begin
-                next_state = READ;
+                next_state = WAIT;
             end
             else begin
                 next_state =WRITE;
             end
         end 
+        WAIT: begin
+            if(m_data_req)begin
+                next_state = READ;
+            end
+            else begin
+                next_state = WAIT;
+            end
+        end
         READ: begin
-            
+            if(m_data_end)begin
+                next_state = IDLE;
+            end
+            else begin
+                next_state = READ;
+            end
         end
         default: begin
-            next_state = WRITE;
+            next_state = IDLE;
         end
     endcase
 end
 
-assign s_data_ready = (curr_state == WRITE);
+always @(posedge clk ) begin
+    if(rst)begin
+        s_data_ready_r <= 1'b0;
+    end
+    else if(curr_state == IDLE)begin
+        s_data_ready_r <= 1'b1;
+    end
+    else if((curr_state == WRITE) && (((s_data_valid & s_data_last) && (wcnt == 3'b111)) || s_data_done))begin
+        s_data_ready_r <= 1'b0;
+    end
+end
+
+assign s_data_ready = s_data_ready_r;
 
 always @(posedge clk ) begin
     if(rst)begin
@@ -200,14 +234,14 @@ always @(posedge clk ) begin
         wen <= 8'b0;
     end
     else begin
-        wen[0] <= (s_data_valid_ff[3] & s_data_last_ff[3]) & (wcnt == 3'd0);
-        wen[1] <= (s_data_valid_ff[3] & s_data_last_ff[3]) & (wcnt == 3'd1);
-        wen[2] <= (s_data_valid_ff[3] & s_data_last_ff[3]) & (wcnt == 3'd2);
-        wen[3] <= (s_data_valid_ff[3] & s_data_last_ff[3]) & (wcnt == 3'd3);
-        wen[4] <= (s_data_valid_ff[3] & s_data_last_ff[3]) & (wcnt == 3'd4);
-        wen[5] <= (s_data_valid_ff[3] & s_data_last_ff[3]) & (wcnt == 3'd5);
-        wen[6] <= (s_data_valid_ff[3] & s_data_last_ff[3]) & (wcnt == 3'd6);
-        wen[7] <= (s_data_valid_ff[3] & s_data_last_ff[3]) & (wcnt == 3'd7);
+        wen[0] <= (s_data_valid_ff[3] == 1'b1) & (wcnt == 3'd0);
+        wen[1] <= (s_data_valid_ff[3] == 1'b1) & (wcnt == 3'd1);
+        wen[2] <= (s_data_valid_ff[3] == 1'b1) & (wcnt == 3'd2);
+        wen[3] <= (s_data_valid_ff[3] == 1'b1) & (wcnt == 3'd3);
+        wen[4] <= (s_data_valid_ff[3] == 1'b1) & (wcnt == 3'd4);
+        wen[5] <= (s_data_valid_ff[3] == 1'b1) & (wcnt == 3'd5);
+        wen[6] <= (s_data_valid_ff[3] == 1'b1) & (wcnt == 3'd6);
+        wen[7] <= (s_data_valid_ff[3] == 1'b1) & (wcnt == 3'd7);
     end
 end
 
@@ -232,12 +266,12 @@ always @(posedge clk ) begin
         wlen <= {{DP_W}{1'b0}};
     end
     else if(s_data_valid_ff[4] & s_data_last_ff[4])begin
-        wlen <= waddr;
+        wlen <= {waddr[(DP_W - 1) : 3], 3'b000} + ({|waddr[2:0], 3'b000});
     end
 end
 
 always @(posedge clk ) begin
-    wdata <= {pipe3[3], pipe3[2], pipe3[1]}; //{Cr, Cb, Y}
+    wdata <= {pipe3[2], pipe3[1], pipe3[0]}; //{Cr, Cb, Y}
 end
 
 always @(posedge clk ) begin
@@ -257,6 +291,8 @@ end
 always @(posedge clk ) begin
     rd_cnt_ff[0] <= rd_cnt;
     rd_cnt_ff[1] <= rd_cnt_ff[0];
+    rd_cnt_ff[2] <= rd_cnt_ff[1];
+    rd_cnt_ff[3] <= rd_cnt_ff[2];
 end
 
 always @(posedge clk ) begin
@@ -304,8 +340,16 @@ always @(posedge clk ) begin
 end
 
 always @(posedge clk ) begin
-    r_time_ff <= r_time;
+    r_time_ff[0] <= r_time;
 end
+
+generate
+    for (i = 0; i < 11; i = i+1) begin : LOOP_R_TIME
+        always @(posedge clk ) begin
+            r_time_ff[i + 1] <= r_time_ff[i];
+        end
+    end
+endgenerate
 
 always @(posedge clk ) begin
     if(rst)begin
@@ -336,18 +380,18 @@ generate
     for (i = 0; i < 8; i = i+1) begin : LOOP_RD
         always @(posedge clk ) begin
             if(ren_ff[1])begin
-                case (r_time_ff)
+                case (r_time_ff[0])
                     2'b00: begin
-                        rdata_t[i] <= {rdata[i][7:0], rdata_t[63:8]};
+                        rdata_t[i] <= {rdata[i][7:0], rdata_t[i][63:8]};
                     end
                     2'b01: begin
-                        rdata_t[i] <= {rdata[i][15:8], rdata_t[63:8]};
+                        rdata_t[i] <= {rdata[i][15:8], rdata_t[i][63:8]};
                     end
                     2'b10: begin
-                        rdata_t[i] <= {rdata[i][23:16], rdata_t[63:8]};
+                        rdata_t[i] <= {rdata[i][23:16], rdata_t[i][63:8]};
                     end
                     default: begin
-                        rdata_t[i] <= {rdata[i][7:0], rdata_t[63:8]};
+                        rdata_t[i] <= {rdata[i][7:0], rdata_t[i][63:8]};
                     end
                 endcase
             end
@@ -385,17 +429,19 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
-        m_valid_ff <= 8'd0;
-        m_last_ff  <= 8'd0;
+        m_valid_ff <= 11'd0;
+        m_last_ff  <= 10'd0;
+        m_end_ff   <= 10'd0;
     end
     else begin
-        m_valid_ff <= {m_valid_ff[6:0], m_valid};
-        m_last_ff  <= {m_last_ff[6:0],  m_last };
+        m_valid_ff <= {m_valid_ff[9:0], m_valid};
+        m_last_ff  <= {m_last_ff[8:0],  m_last };
+        m_end_ff   <= {m_end_ff[8:0],   r_row_last && (r_time == 2'b11)};
     end
 end
 
 always @(posedge clk ) begin
-    case (rd_cnt_ff[2])
+    case (rd_cnt_ff[3])
         6'd7:begin
             m_data_r <= rdata_t[0];
         end 
@@ -411,11 +457,14 @@ always @(posedge clk ) begin
         6'd39:begin
             m_data_r <= rdata_t[4];
         end
-        6'47:begin
+        6'd47:begin
             m_data_r <= rdata_t[5];
         end
         6'd55:begin
             m_data_r <= rdata_t[6];
+        end
+        6'd63:begin
+            m_data_r <= rdata_t[7];
         end
         default: begin
             m_data_r <= m_data_r;
@@ -427,16 +476,20 @@ always @(posedge clk ) begin
     if(rst)begin
         m_data_valid_r <= 1'b0;
         m_data_last_r  <= 1'b0;
+        m_data_end_r   <= 1'b0;
     end
     else begin
-        m_data_valid_r <= m_valid_ff[7];
-        m_data_last_r  <= m_last_ff [7];
+        m_data_valid_r <= m_valid_ff[8] | m_valid_ff[9] | m_valid_ff[10];
+        m_data_last_r  <= m_last_ff [9];
+        m_data_end_r   <= m_end_ff  [9];
     end
 end
 
 assign m_data       = m_data_r      ;
 assign m_data_valid = m_data_valid_r;
 assign m_data_last  = m_data_last_r ;
+assign m_data_end   = m_data_end_r  ;
+assign m_data_user  = r_time_ff[11] ;
 
 generate
     for (i = 0; i < 8; i = i+1) begin : LOOP_MEM

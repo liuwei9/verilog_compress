@@ -17,7 +17,7 @@ module jpeg_in_buf_ctrl #(
     output [63:0]                   m_data           ,
     output                          m_data_valid     ,
     output                          m_data_last      ,
-    input                           m_data_req       ,
+    output [1:0]                    m_data_user      ,
 
     output [31:0]                   ping_s_data      ,
     output                          ping_s_data_valid,
@@ -34,16 +34,16 @@ module jpeg_in_buf_ctrl #(
     input [63:0]                    ping_m_data      ,
     input                           ping_m_data_valid,
     input                           ping_m_data_last ,
-    input                           ping_m_data_user ,
-    output                          ping_m_data_req  ,
+    input [1:0]                     ping_m_data_user ,
     input                           ping_m_data_end  ,
+    output                          ping_m_data_req  ,
 
     input [63:0]                    pang_m_data      ,
     input                           pang_m_data_valid,
     input                           pang_m_data_last ,
-    input                           pang_m_data_user ,
-    output                          pang_m_data_req  ,
-    input                           pang_m_data_end  
+    input [1:0]                     pang_m_data_user ,
+    input                           pang_m_data_end  ,
+    output                          pang_m_data_req  
 );
 
 localparam IMG_H_W = $clog2(IMG_H);
@@ -179,10 +179,11 @@ assign s_data_ready = w_ping == 1'b0 ? ping_s_data_ready : pang_s_data_ready;
 assign m_data       = r_ping == 1'b0 ? ping_m_data       : pang_m_data      ;
 assign m_data_valid = r_ping == 1'b0 ? ping_m_data_valid : pang_m_data_valid;
 assign m_data_last  = r_ping == 1'b0 ? ping_m_data_last  : pang_m_data_last ;
-
-assign ping_m_data_req = r_ping == 1'b0 ? m_data_req : 1'b0;
-assign pang_m_data_req = r_ping == 1'b1 ? m_data_req : 1'b0;
+assign m_data_user  = r_ping == 1'b0 ? ping_m_data_user  : pang_m_data_user ;
 
 assign m_data_end = ping_m_data_end | pang_m_data_end;
+
+assign ping_m_data_req = r_ping == 1'b0;
+assign pang_m_data_req = r_ping == 1'b1;
 
 endmodule

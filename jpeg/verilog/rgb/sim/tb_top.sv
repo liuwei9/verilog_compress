@@ -104,7 +104,7 @@ task automatic load_img;
     row_num <= {file_header[25], file_header[24], file_header[23], file_header[22]};
     col_num <= {file_header[21], file_header[20], file_header[19], file_header[18]};
     @(posedge clk);
-    row_size <= (col_num + 2'd3) / 3'd4 * 3'd4;
+    row_size <= (col_num * 2'd3 + 2'd3) / 3'd4 * 3'd4;
     col_cnt  <= 0;
     row_cnt  <= 0;
     @(posedge clk);
@@ -127,7 +127,7 @@ task automatic read_bmp_rgb;
             if(col_cnt == col_num - 1)
                 s_data_last <= 1'b1;
             pix_index <= pix_index + 3;
-            s_data <= {8'd0, mem[pix_index + 2], m_data[pix_index + 1], m_data[pix_index]}; //{0, r g b};
+            s_data <= {8'd0, mem[pix_index + 2], mem[pix_index + 1], mem[pix_index]}; //{0, r g b};
             do @(posedge clk); while (!s_data_ready);
         end
     end
