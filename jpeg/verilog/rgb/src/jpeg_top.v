@@ -28,6 +28,11 @@ wire        in_buf_m_data_valid;
 wire        in_buf_m_data_last ;
 wire [1:0]  in_buf_m_data_user ;
 
+wire [10:0] dct_m_data      ;
+wire        dct_m_data_valid;
+wire        dct_m_data_last ;
+wire [1:0]  dct_m_data_user ;
+
 jpeg_in_buf_top #(
     .IMG_H (MAX_IMG_H),
     .IMG_W (MAX_IMG_W)
@@ -48,6 +53,21 @@ jpeg_in_buf_top #(
     .m_data_valid     (in_buf_m_data_valid),
     .m_data_last      (in_buf_m_data_last ),
     .m_data_user      (in_buf_m_data_user )
+);
+
+jpeg_dct jpeg_dct_inst(
+    .clk          (clk          ),
+    .rst          (rst          ),
+
+    .s_data       (in_buf_m_data      ),
+    .s_data_valid (in_buf_m_data_valid),
+    .s_data_last  (in_buf_m_data_last ),
+    .s_data_user  (in_buf_m_data_user ),
+
+    .m_data       (dct_m_data         ),
+    .m_data_valid (dct_m_data_valid   ),
+    .m_data_last  (dct_m_data_last    ),
+    .m_data_user  (dct_m_data_user    )
 );
 
 
