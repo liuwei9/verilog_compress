@@ -2,7 +2,9 @@ module jpeg_top #(
     parameter MAX_IMG_H      = 1080,
     parameter MAX_IMG_W      = 1920,
     parameter QUANT_LUM_PATH = "divLumMatrix.mem",
-    parameter DIV_LUM_PATH   = "quantLumMatrix.mem"  
+    parameter DIV_LUM_PATH   = "quantLumMatrix.mem" ,
+    parameter QUANT_CHROM_PATH = "divChromMatrix.mem",
+    parameter DIV_CHROM_PATH   = "quantChromMatrix.mem" 
 ) (
     input          clk              ,
     input          rst              ,
@@ -32,6 +34,22 @@ wire [10:0] dct_m_data      ;
 wire        dct_m_data_valid;
 wire        dct_m_data_last ;
 wire [1:0]  dct_m_data_user ;
+
+wire        quant_lum_ren    ;
+wire [12:0] quant_lum_raddr  ;
+wire [7:0]  quant_lum_rdata  ;
+
+wire        div_lum_ren      ;
+wire [12:0] div_lum_raddr    ;
+wire [17:0] div_lum_rdata    ;
+
+wire        quant_chrom_ren  ;
+wire [12:0] quant_chrom_raddr;
+wire [7:0]  quant_chrom_rdata;
+
+wire        div_chrom_ren    ;
+wire [12:0] div_chrom_raddr  ;
+wire [17:0] div_chrom_rdata  ;
 
 jpeg_in_buf_top #(
     .IMG_H (MAX_IMG_H),
@@ -68,6 +86,59 @@ jpeg_dct jpeg_dct_inst(
     .m_data_valid (dct_m_data_valid   ),
     .m_data_last  (dct_m_data_last    ),
     .m_data_user  (dct_m_data_user    )
+);
+
+jpeg_quant_table #(
+    .QUANT_LUM_PATH   (QUANT_LUM_PATH  ),
+    .DIV_LUM_PATH     (DIV_LUM_PATH    ),
+    .QUANT_CHROM_PATH (QUANT_CHROM_PATH),
+    .DIV_CHROM_PATH   (DIV_CHROM_PATH  )
+) jpeg_quant_table_inst (
+    .clk                (clk                ),
+    .jpeg_start         (jpeg_start         ),
+
+    .quant_lum_ren      (quant_lum_ren      ),
+    .quant_lum_raddr    (quant_lum_raddr    ),
+    .quant_lum_rdata    (quant_lum_rdata    ),
+
+    .div_lum_ren        (div_lum_ren        ),
+    .div_lum_raddr      (div_lum_raddr      ),
+    .div_lum_rdata      (div_lum_rdata      ),
+
+    .quant_chrom_ren    (quant_chrom_ren    ),
+    .quant_chrom_raddr  (quant_chrom_raddr  ),
+    .quant_chrom_rdata  (quant_chrom_rdata  ),
+
+    .div_chrom_ren      (div_chrom_ren      ),
+    .div_chrom_raddr    (div_chrom_raddr    ),
+    .div_chrom_rdata    (div_chrom_rdata    )
+    
+);
+
+jpeg_quant jpeg_quant_inst(
+    .clk              (clk              ),
+    .rst              (rst              ),
+
+    .cfg_quality      (cfg_quality      ), 
+    .jpeg_start       (jpeg_start       ),
+
+    .s_data           (dct_m_data       ),
+    .s_data_valid     (dct_m_data_valid ),
+    .s_data_last      (dct_m_data_last  ),
+    .s_data_user      (dct_m_data_user  ),
+
+    .div_lum_ren      (div_lum_ren      ),
+    .div_lum_raddr    (div_lum_raddr    ),
+    .div_lum_rdata    (div_lum_rdata    ),
+    .div_chrom_ren    (div_chrom_ren    ),
+    .div_chrom_raddr  (div_chrom_raddr  ),
+    .div_chrom_rdata  (div_chrom_rdata  ),
+
+    .m_data           (quant_m_data      ),
+    .m_zero_cnt       (quant_m_zero_cnt  ),
+    .m_data_valid     (quant_m_data_valid),
+    .m_data_last      (quant_m_data_last ),
+    .m_data_user      (quant_m_data_user ) 
 );
 
 
