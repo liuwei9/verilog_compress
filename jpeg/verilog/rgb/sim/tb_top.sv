@@ -38,16 +38,18 @@ end
 string jpeg_path_pre = "E:/python_image_sim/pythonProject/jpeg/img/dut_jpeg";
 string jpeg_path;
 integer quality_i;
-initial begin
-    load_img("E:/python_image_sim/pythonProject/jpeg/img/dut_img.bmp");
-    for (quality_i = 5; quality_i <= 100; quality_i = quality_i + 5) begin
-        do_sim(quality_i);
-    end
-    $finish;
-end
+// initial begin
+//     load_img("E:/python_image_sim/pythonProject/jpeg/img/dut_img.bmp");
+//     for (quality_i = 5; quality_i <= 100; quality_i = quality_i + 5) begin
+//         do_sim(quality_i);
+//     end
+//     $finish;
+// end
 
 initial begin
-    
+    load_img("E:/python_image_sim/pythonProject/jpeg/img/dut_img.bmp");
+    do_sim(40);
+    $finish;
 end
 
 jpeg_top #(
