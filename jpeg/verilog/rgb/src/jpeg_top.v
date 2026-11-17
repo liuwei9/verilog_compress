@@ -51,6 +51,12 @@ wire        div_chrom_ren    ;
 wire [12:0] div_chrom_raddr  ;
 wire [17:0] div_chrom_rdata  ;
 
+wire [11:0] quant_m_data      ;
+wire [6:0]  quant_m_zero_cnt  ;
+wire        quant_m_data_valid;
+wire        quant_m_data_last ;
+wire [1:0]  quant_m_data_user ;
+
 jpeg_in_buf_top #(
     .IMG_H (MAX_IMG_H),
     .IMG_W (MAX_IMG_W)

@@ -18,7 +18,7 @@ module jpeg_quant (
     input  [17:0]  div_chrom_rdata  ,
     
     output [11:0]  m_data           ,
-    output [5:0]   m_zero_cnt       ,
+    output [6:0]   m_zero_cnt       ,
     output         m_data_valid     ,
     output         m_data_last      ,
     output [1:0]   m_data_user       
@@ -39,6 +39,7 @@ reg [6:0] s_data_last_ff ;
 
 reg [5:0]  zero_cnt;
 reg [5:0]  zero_cnt_ff;
+reg [6:0]  zero_cnt_ff_add1;
 reg [11:0] round_data_ff;
 reg        valid;
 reg        valid_zero_last;
@@ -148,12 +149,17 @@ always @(posedge clk ) begin
         zero_cnt <= 6'd0;
     end
     else begin
-        if(s_data_valid_ff[5] & (s_data_valid_ff[6]))begin
-            if(round_data[11:0] == 12'd0)begin
-                zero_cnt <= zero_cnt + 6'd1;
+        if(s_data_valid_ff[5])begin
+            if(s_data_last_ff[5])begin
+                zero_cnt <= 6'd0;
             end
             else begin
-                zero_cnt <= 6'd0;
+                if(round_data == 12'd0)begin
+                    zero_cnt <= zero_cnt + 6'd1; 
+                end
+                else begin
+                    zero_cnt <= 6'd0;
+                end
             end
         end
         else begin
@@ -163,7 +169,8 @@ always @(posedge clk ) begin
 end 
 
 always @(posedge clk ) begin
-    zero_cnt_ff <= zero_cnt;
+    zero_cnt_ff_add1 <= zero_cnt + 6'd1;
+    zero_cnt_ff      <= zero_cnt;
 end
 
 always @(posedge clk ) begin
@@ -176,13 +183,13 @@ always @(posedge clk ) begin
         valid_zero_last <= 1'b0;
     end
     else begin
-        valid <= (s_data_valid_ff[5] & ((!s_data_valid_ff[6]) || (round_data[11:0] != 12'd0)) || (s_data_last_ff[5])); 
+        valid <= s_data_valid_ff[5] && ((round_data != 12'd0) || s_data_last_ff[5]); 
         valid_zero_last <= s_data_valid_ff[5] & (round_data[11:0] == 12'd0) & s_data_last_ff[5];
     end
 end
 
 assign m_data       = round_data_ff     ;
-assign m_zero_cnt   = valid_zero_last ? zero_cnt : zero_cnt_ff;
+assign m_zero_cnt   = valid_zero_last ? zero_cnt_ff_add1 : zero_cnt_ff;
 assign m_data_valid = valid             ;
 assign m_data_last  = s_data_last_ff [6];
     
