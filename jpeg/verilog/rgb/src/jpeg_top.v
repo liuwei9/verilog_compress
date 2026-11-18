@@ -25,6 +25,10 @@ module jpeg_top #(
     output         m_data_last      
 );
 
+wire [7:0]  jpeg_head_data      ;
+wire        jpeg_head_data_valid;
+wire        jpeg_head_data_last ;
+
 wire [63:0] in_buf_m_data      ;
 wire        in_buf_m_data_valid;
 wire        in_buf_m_data_last ;
@@ -56,6 +60,27 @@ wire [6:0]  quant_m_zero_cnt  ;
 wire        quant_m_data_valid;
 wire        quant_m_data_last ;
 wire [1:0]  quant_m_data_user ;
+
+jpeg_head_yuv444 jpeg_head_yuv444_inst(
+    .clk                  (clk                 ),
+    .rst                  (rst                 ),
+
+    .cfg_img_h            (cfg_img_h           ),
+    .cfg_img_w            (cfg_img_w           ),
+    .cfg_quality          (cfg_quality         ), 
+    .jpeg_start           (jpeg_start          ),
+
+    .quant_lum_ren        (quant_lum_ren       ),
+    .quant_lum_raddr      (quant_lum_raddr     ),
+    .quant_lum_rdata      (quant_lum_rdata     ),
+    .quant_chrom_ren      (quant_chrom_ren     ),
+    .quant_chrom_raddr    (quant_chrom_raddr   ),
+    .quant_chrom_rdata    (quant_chrom_rdata   ),
+
+    .jpeg_head_data       (jpeg_head_data      ),
+    .jpeg_head_data_valid (jpeg_head_data_valid),
+    .jpeg_head_data_last  (jpeg_head_data_last ) 
+);
 
 jpeg_in_buf_top #(
     .IMG_H (MAX_IMG_H),
