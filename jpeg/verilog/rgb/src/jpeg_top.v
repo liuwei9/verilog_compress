@@ -61,6 +61,19 @@ wire        quant_m_data_valid;
 wire        quant_m_data_last ;
 wire [1:0]  quant_m_data_user ;
 
+wire [3:0]  chrom_dc_raddr;
+wire [3:0]  chrom_dc_len  ;
+wire [10:0] chrom_dc_code ;
+wire [7:0]  chrom_ac_raddr;
+wire [4:0]  chrom_ac_len  ;
+wire [15:0] chrom_ac_code ;
+wire [3:0]  lum_dc_raddr  ;
+wire [3:0]  lum_dc_len    ;
+wire [8:0]  lum_dc_code   ;
+wire [7:0]  lum_ac_raddr  ;
+wire [4:0]  lum_ac_len    ;
+wire [15:0] lum_ac_code   ;
+
 jpeg_head_yuv444 jpeg_head_yuv444_inst(
     .clk                  (clk                 ),
     .rst                  (rst                 ),
@@ -172,5 +185,40 @@ jpeg_quant jpeg_quant_inst(
     .m_data_user      (quant_m_data_user ) 
 );
 
+jpeg_lum_ac_table jpeg_lum_ac_table_inst(
+    .clk          (clk         ),
+    .rst          (rst         ),
+
+    .lum_ac_raddr (lum_ac_raddr),
+    .lum_ac_len   (lum_ac_len  ),
+    .lum_ac_code  (lum_ac_code ) 
+);
+
+jpeg_lum_dc_table jpeg_lum_dc_table_inst(
+    .clk          (clk          ),
+    .rst          (rst          ),
+
+    .lum_dc_raddr (lum_dc_raddr ),
+    .lum_dc_len   (lum_dc_len   ),
+    .lum_dc_code  (lum_dc_code  ) 
+);
+
+jpeg_chrom_ac_table jpeg_chrom_ac_table_inst(
+    .clk            (clk            )
+    .rst            (rst            )
+
+    .chrom_ac_raddr (chrom_ac_raddr )
+    .chrom_ac_len   (chrom_ac_len   )
+    .chrom_ac_code  (chrom_ac_code  ),
+);
+
+jpeg_chrom_dc_table jpeg_chrom_dc_table_inst(
+    .clk            (clk            ),
+    .rst            (rst            ),
+
+    .chrom_dc_raddr (chrom_dc_raddr ),
+    .chrom_dc_len   (chrom_dc_len   ),
+    .chrom_dc_code  (chrom_dc_code  )
+);
 
 endmodule
