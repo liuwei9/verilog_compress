@@ -52,6 +52,9 @@ always @(posedge clk ) begin
         else if((cnt > 10'd0) && (cnt <= HEAD_CNT))begin
             cnt <= cnt + 10'd1;
         end
+        else begin
+            cnt <= 10'd0;
+        end
     end
 end
 
