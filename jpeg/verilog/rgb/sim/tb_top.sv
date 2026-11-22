@@ -4,10 +4,12 @@ module tb_top (
 logic clk;
 logic rst;
 
-parameter MAX_IMG_H      = 720 ;
-parameter MAX_IMG_W      = 1280;
-parameter QUANT_LUM_PATH = "E:/jpeg/jpeg_ku5p/user/src/jpeg/common/quantLumMatrix.mem";
-parameter DIV_LUM_PATH   = "E:/jpeg/jpeg_ku5p/user/src/jpeg/common/divLumMatrix.mem"  ;
+parameter MAX_IMG_H        = 720 ;
+parameter MAX_IMG_W        = 1280;
+parameter QUANT_LUM_PATH   = "E:/jpeg/jpeg_ku5p/user/src/jpeg/common/quantLumMatrix.mem";
+parameter DIV_LUM_PATH     = "E:/jpeg/jpeg_ku5p/user/src/jpeg/common/divLumMatrix.mem"  ;
+parameter QUANT_CHROM_PATH = "E:/jpeg/jpeg_ku5p/user/src/jpeg/common/quantChromMatrix.mem";
+parameter DIV_CHROM_PATH   = "E:/jpeg/jpeg_ku5p/user/src/jpeg/common/divChromMatrix.mem"  ;
 
 logic [15:0]   cfg_img_h    = 720  ;
 logic [15:0]   cfg_img_w    = 1280 ;

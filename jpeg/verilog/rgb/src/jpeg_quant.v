@@ -43,6 +43,7 @@ reg [6:0]  zero_cnt_ff_add1;
 reg [11:0] round_data_ff;
 reg        valid;
 reg        valid_zero_last;
+reg first_flag;
 
 reg [1:0] s_data_user_ff [6:0];
 genvar i;
@@ -179,11 +180,25 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
+        first_flag <= 1'b1;
+    end
+    else begin
+        if(s_data_last_ff[5])begin
+            first_flag <= 1'b1;
+        end
+        else if(s_data_valid_ff[5])begin
+            first_flag <= 1'b0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
         valid <= 1'b0;
         valid_zero_last <= 1'b0;
     end
     else begin
-        valid <= s_data_valid_ff[5] && ((round_data != 12'd0) || s_data_last_ff[5]); 
+        valid <= s_data_valid_ff[5] && ((round_data != 12'd0) || s_data_last_ff[5] || first_flag); 
         valid_zero_last <= s_data_valid_ff[5] & (round_data[11:0] == 12'd0) & s_data_last_ff[5];
     end
 end

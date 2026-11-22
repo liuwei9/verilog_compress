@@ -165,7 +165,7 @@ always @(posedge clk ) begin
         first_flag_ff <= {first_flag_ff[5:0], first_flag};
         t_valid_ff    <= {t_valid_ff[5:0], fifo_m_valid & fifo_m_ready};
         t_last_ff     <= {t_last_ff[5:0], last_data};
-        t_user_ff     <= {t_last_ff[5:0], t_user == 2'b00};
+        t_user_ff     <= {t_user_ff[5:0], t_user == 2'b00};
     end
 end
 

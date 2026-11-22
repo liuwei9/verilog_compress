@@ -1,10 +1,10 @@
 module jpeg_top #(
     parameter MAX_IMG_H      = 1080,
     parameter MAX_IMG_W      = 1920,
-    parameter QUANT_LUM_PATH = "divLumMatrix.mem",
-    parameter DIV_LUM_PATH   = "quantLumMatrix.mem" ,
-    parameter QUANT_CHROM_PATH = "divChromMatrix.mem",
-    parameter DIV_CHROM_PATH   = "quantChromMatrix.mem" 
+    parameter QUANT_LUM_PATH = "quantLumMatrix.mem",
+    parameter DIV_LUM_PATH   = "divLumMatrix.mem" ,
+    parameter QUANT_CHROM_PATH = "quantChromMatrix.mem",
+    parameter DIV_CHROM_PATH   = "divChromMatrix.mem" 
 ) (
     input          clk              ,
     input          rst              ,

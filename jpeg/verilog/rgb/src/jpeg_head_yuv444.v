@@ -18,7 +18,7 @@ module jpeg_head_yuv444 (
     output         jpeg_head_data_valid,
     output         jpeg_head_data_last  
 );
-localparam HEAD_CNT = 9'd25 + 9'd64 + 9'd5 + 9'd64 + 9'd465 + 9'd1;
+localparam HEAD_CNT = 10'd25 + 10'd64 + 10'd5 + 10'd64 + 10'd465 + 10'd1;
 reg [9:0]  cnt  ;
 reg [8:0]  addr0;
 reg [12:0] addr1;

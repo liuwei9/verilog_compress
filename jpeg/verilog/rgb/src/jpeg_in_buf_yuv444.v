@@ -60,6 +60,7 @@ reg  [DP_W - 1 : 0] raddr;
 wire [23 : 0]       rdata [7:0];
 reg  [2:0]          wcnt ;
 reg  [DP_W - 1 : 0] wlen ;
+reg  [DP_W - 1 : 0] raddr_last;
 
 reg [1:0] ren_ff;
 reg [63:0] rdata_t [7:0];
@@ -75,7 +76,7 @@ reg m_valid;
 reg m_last ;
 reg [10:0] m_valid_ff;
 reg [9:0]  m_last_ff ;
-reg [9:0]  m_end_ff  ;
+reg [10:0] m_end_ff  ;
 reg [9:0]  m_user_ff ;
 
 reg [63:0] m_data_r      ;
@@ -188,7 +189,7 @@ always @(*) begin
             end
         end
         READ: begin
-            if(m_data_end)begin
+            if(r_row_last)begin
                 next_state = IDLE;
             end
             else begin
@@ -320,6 +321,20 @@ always @(posedge clk ) begin
         else if((raddr == wlen) && (&rd_cnt))begin
             raddr <= {{DP_W}{1'b0}};
         end
+        else if(((r_time_ff[0] == 2'b00) || (r_time_ff[1] == 2'b01)) && (m_valid == 1'b1))begin
+            raddr <= raddr_last;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        raddr_last <= {{DP_W}{1'b0}};
+    end
+    else begin
+        if(ren && (rd_cnt == 6'd1))begin
+            raddr_last <= raddr;
+        end
     end
 end
 
@@ -332,8 +347,13 @@ always @(posedge clk ) begin
             r_time <= 2'd0;
         end
         else begin
-            if((raddr == wlen) && (&rd_cnt))begin
-                r_time <= r_time + 2'd1;
+            if(&rd_cnt)begin
+                if(r_time == 2'b10)begin
+                    r_time <= 2'd0;
+                end
+                else begin
+                    r_time <= r_time + 2'd1;
+                end                
             end
         end
     end
@@ -356,7 +376,7 @@ always @(posedge clk ) begin
         r_row_last <= 1'd0;
     end
     else begin
-        if((raddr == wlen) && (&rd_cnt))begin
+        if((raddr == wlen) && (rd_cnt == 6'd62) && (r_time == 2'b10))begin
             r_row_last <= 1'd1;
         end
         else begin
@@ -431,12 +451,12 @@ always @(posedge clk ) begin
     if(rst)begin
         m_valid_ff <= 11'd0;
         m_last_ff  <= 10'd0;
-        m_end_ff   <= 10'd0;
+        m_end_ff   <= 11'd0;
     end
     else begin
         m_valid_ff <= {m_valid_ff[9:0], m_valid};
         m_last_ff  <= {m_last_ff[8:0],  m_last };
-        m_end_ff   <= {m_end_ff[8:0],   r_row_last && (r_time == 2'b11)};
+        m_end_ff   <= {m_end_ff[9:0],   r_row_last};
     end
 end
 
@@ -481,7 +501,7 @@ always @(posedge clk ) begin
     else begin
         m_data_valid_r <= m_valid_ff[8] | m_valid_ff[9] | m_valid_ff[10];
         m_data_last_r  <= m_last_ff [9];
-        m_data_end_r   <= m_end_ff  [9];
+        m_data_end_r   <= m_end_ff  [10];
     end
 end
 

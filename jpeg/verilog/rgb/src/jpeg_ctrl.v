@@ -37,8 +37,8 @@ reg [63:0] head_data ;
 reg        head_valid;
 reg        head_last ;
 
-reg [27:0]  huffman_data_temp;
-reg [4:0]   huffman_data_temp_bits;
+reg [63:0]  huffman_data_temp;
+reg [6:0]   huffman_data_temp_bits;
 reg [63:0]  huffman_64;
 reg [6:0]   huffman_64_bits;
 reg [31:0]  huffman_32;
@@ -189,16 +189,20 @@ end
 
 always @(posedge clk ) begin
     if(rst)begin
-        huffman_data_temp_bits <=  5'd0;
-        huffman_data_temp      <= 28'd0;
+        huffman_data_temp_bits <=  7'd0;
+        huffman_data_temp      <= 64'd0;
+    end
+    else if(head_last)begin
+        huffman_data_temp_bits <= 7'd56;
+        huffman_data_temp <= {8'd0, head_data[15:8], head_data[23:16], head_data[31:24], head_data[39:32], head_data[47:40], head_data[55:48], head_data[63:56]};
     end
     else if(huffman_s_data_valid)begin
         huffman_data_temp_bits <= huffman_s_len + huffman_s_bits;
         huffman_data_temp      <= (huffman_s_code << huffman_s_bits) | huffman_s_data;
     end
     else begin
-        huffman_data_temp_bits <=  5'd0;
-        huffman_data_temp      <= 28'd0;
+        huffman_data_temp_bits <=  7'd0;
+        huffman_data_temp      <= 64'd0;
     end   
 end
 
