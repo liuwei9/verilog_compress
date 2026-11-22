@@ -74,6 +74,13 @@ wire [7:0]  lum_ac_raddr  ;
 wire [4:0]  lum_ac_len    ;
 wire [15:0] lum_ac_code   ;
 
+wire [4:0]   huffman_m_len       ;
+wire [15:0]  huffman_m_code      ;
+wire [3:0]   huffman_m_bits      ;
+wire [11:0]  huffman_m_data      ;
+wire         huffman_m_data_valid;
+wire         huffman_m_data_last ;
+
 jpeg_head_yuv444 jpeg_head_yuv444_inst(
     .clk                  (clk                 ),
     .rst                  (rst                 ),
@@ -204,12 +211,12 @@ jpeg_lum_dc_table jpeg_lum_dc_table_inst(
 );
 
 jpeg_chrom_ac_table jpeg_chrom_ac_table_inst(
-    .clk            (clk            )
-    .rst            (rst            )
+    .clk            (clk            ),
+    .rst            (rst            ),
 
-    .chrom_ac_raddr (chrom_ac_raddr )
-    .chrom_ac_len   (chrom_ac_len   )
-    .chrom_ac_code  (chrom_ac_code  ),
+    .chrom_ac_raddr (chrom_ac_raddr ),
+    .chrom_ac_len   (chrom_ac_len   ),
+    .chrom_ac_code  (chrom_ac_code  )
 );
 
 jpeg_chrom_dc_table jpeg_chrom_dc_table_inst(
@@ -219,6 +226,40 @@ jpeg_chrom_dc_table jpeg_chrom_dc_table_inst(
     .chrom_dc_raddr (chrom_dc_raddr ),
     .chrom_dc_len   (chrom_dc_len   ),
     .chrom_dc_code  (chrom_dc_code  )
+);
+
+jpeg_huffman jpeg_huffman_inst(
+    .clk              (clk              ),
+    .rst              (rst              ),
+
+    .jpeg_start       (jpeg_start       ),
+
+    .s_data           (quant_m_data      ),
+    .s_zero_cnt       (quant_m_zero_cnt  ),
+    .s_data_valid     (quant_m_data_valid),
+    .s_data_last      (quant_m_data_last ),
+    .s_data_user      (quant_m_data_user ),
+
+    .lum_dc_raddr     (lum_dc_raddr     ),
+    .lum_ac_raddr     (lum_ac_raddr     ),
+    .chrom_dc_raddr   (chrom_dc_raddr   ),
+    .chrom_ac_raddr   (chrom_ac_raddr   ),
+
+    .lum_ac_len       (lum_ac_len       ),
+    .lum_ac_code      (lum_ac_code      ),
+    .lum_dc_len       (lum_dc_len       ),
+    .lum_dc_code      (lum_dc_code      ),
+    .chrom_ac_len     (chrom_ac_len     ),
+    .chrom_ac_code    (chrom_ac_code    ),
+    .chrom_dc_len     (chrom_dc_len     ),
+    .chrom_dc_code    (chrom_dc_code    ),
+
+    .m_len            (huffman_m_len       ),
+    .m_code           (huffman_m_code      ),
+    .m_bits           (huffman_m_bits      ),
+    .m_data           (huffman_m_data      ),
+    .m_data_valid     (huffman_m_data_valid),
+    .m_data_last      (huffman_m_data_last ) 
 );
 
 endmodule

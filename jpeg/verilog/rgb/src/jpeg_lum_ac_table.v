@@ -8,7 +8,7 @@ module jpeg_lum_ac_table (
 );
 
 always @(posedge clk ) begin
-    case (lum_lum_ac_raddr)
+    case (lum_ac_raddr)
         8'd0: begin
             lum_ac_len  <=  5'd4;
             lum_ac_code <= 16'd10;

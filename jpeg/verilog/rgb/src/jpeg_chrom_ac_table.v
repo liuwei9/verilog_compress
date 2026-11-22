@@ -1,10 +1,10 @@
 module jpeg_chrom_ac_table (
-    input         clk     ,
-    input         rst     ,
+    input             clk           ,
+    input             rst           ,
 
-    input  [7:0]  chrom_ac_raddr,
-    output [4:0]  chrom_ac_len  ,
-    output [15:0] chrom_ac_code  
+    input      [7:0]  chrom_ac_raddr,
+    output reg [4:0]  chrom_ac_len  ,
+    output reg [15:0] chrom_ac_code  
 );
 
 always @(posedge clk ) begin
