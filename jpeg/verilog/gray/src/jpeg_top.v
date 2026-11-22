@@ -1,8 +1,8 @@
 module jpeg_top #(
     parameter MAX_IMG_H      = 1080,
     parameter MAX_IMG_W      = 1920,
-    parameter QUANT_LUM_PATH = "divLumMatrix.mem",
-    parameter DIV_LUM_PATH   = "quantLumMatrix.mem"  
+    parameter QUANT_LUM_PATH = "quantLumMatrix.mem",
+    parameter DIV_LUM_PATH   = "divLumMatrix.mem"  
 ) (
     input          clk              ,
     input          rst              ,
