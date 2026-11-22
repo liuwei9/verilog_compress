@@ -1,0 +1,482 @@
+module jpeg_ctrl (
+    input          clk                 ,
+    input          rst                 ,
+
+    input          jpeg_start          ,
+    input [15:0]   cfg_img_h           ,
+    input [15:0]   cfg_img_w           ,
+
+    input [7:0]    jpeg_head_data      ,
+    input          jpeg_head_data_valid,
+    input          jpeg_head_data_last ,
+
+    input [4:0]    huffman_s_len       ,
+    input [15:0]   huffman_s_code      ,
+    input [3:0]    huffman_s_bits      ,
+    input [11:0]   huffman_s_data      ,
+    input          huffman_s_data_valid,
+    input          huffman_s_data_last ,
+
+    output [63:0]  m_data              ,
+    output [ 7:0]  m_data_keep         ,
+    output         m_data_valid        ,
+    output         m_data_last         
+);
+
+genvar i;
+
+localparam IDLE = 3'b001;
+localparam HEAD = 3'b010;
+localparam WAIT = 3'b100;
+
+reg [2:0] curr_state;
+reg [2:0] next_state;
+
+reg [2:0]  head_cnt  ;
+reg [63:0] head_data ;
+reg        head_valid;
+reg        head_last ;
+
+reg [27:0]  huffman_data_temp;
+reg [4:0]   huffman_data_temp_bits;
+reg [63:0]  huffman_64;
+reg [6:0]   huffman_64_bits;
+reg [31:0]  huffman_32;
+reg [5:0]   huffman_32_bits;
+reg [15:0]  huffman_32_padding      [3:0];
+reg [4:0]   huffman_32_padding_bits [3:0];
+reg [31:0]  huffman_64_p_t1;
+reg [5:0]   huffman_64_p_bits_t1;
+reg [31:0]  huffman_64_p_t2;
+reg [5:0]   huffman_64_p_bits_t2;
+reg [63:0]  huffman_64_p;
+reg [6:0]   huffman_64_p_bits;
+reg [127:0] huffman_128;
+reg [7:0]   huffman_128_bits;
+reg [63:0]  huffman_data;
+reg         huffman_data_valid_1;
+
+wire [63:0] huffman_data_reverse;
+
+reg huffman_s_frame_end_flag;
+wire huffman_s_frame_end;
+reg [10:0]   huffman_s_frame_end_ff;
+
+reg [15:0]   img_h_num;
+reg [15:0]   img_w_num;
+reg [15:0]   img_h_cnt;
+reg [15:0]   img_w_cnt;
+
+always @(posedge clk ) begin
+    img_h_num <= cfg_img_h[15:3] + (|cfg_img_h[2:0]);
+    img_w_num <= cfg_img_w[15:3] + (|cfg_img_w[2:0]);
+end
+always @(posedge clk ) begin
+    if(rst)begin
+        img_w_cnt <= 16'd1;
+    end
+    else begin
+        if(huffman_s_data_valid & huffman_s_data_last)begin
+            if(img_w_cnt == img_w_num)begin
+                img_w_cnt <= 16'd1;
+            end
+            else begin
+                img_w_cnt <= img_w_cnt + 16'd1;
+            end
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        img_h_cnt <= 16'd1;
+    end
+    else begin
+        if(huffman_s_data_valid & huffman_s_data_last)begin
+            if(img_w_cnt == img_w_num)begin
+                if(img_h_num == img_h_cnt)begin
+                    img_h_cnt <= 16'd1;
+                end
+                else begin
+                    img_h_cnt <= img_h_cnt + 16'd1;
+                end
+            end
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_s_frame_end_flag <= 1'b0;
+    end
+    else begin
+        huffman_s_frame_end_flag <= (img_h_cnt == img_h_num) && (img_w_cnt == img_w_num);
+    end
+end
+
+assign huffman_s_frame_end = huffman_s_frame_end_flag && (huffman_s_data_valid & huffman_s_data_last);
+
+always @(posedge clk ) begin
+    if(rst)begin
+        curr_state <= IDLE;
+    end
+    else begin
+        curr_state <= next_state;
+    end
+end
+
+always @(*) begin
+    case (curr_state)
+        IDLE: begin
+            if(jpeg_start)begin
+                next_state = HEAD;
+            end
+            else begin
+                next_state = IDLE;
+            end
+        end 
+        HEAD: begin
+            if(jpeg_head_data_last & jpeg_head_data_valid)begin
+                next_state = WAIT;
+            end
+            else begin
+                next_state = HEAD;
+            end
+        end
+        WAIT: begin
+            if(m_data_valid & m_data_last)begin
+                next_state = IDLE;
+            end
+            else begin
+                next_state = WAIT;
+            end
+        end
+        default: begin
+            next_state = IDLE;
+        end
+    endcase
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        head_cnt <= 3'd0;
+    end
+    else begin
+        if(curr_state == IDLE)begin
+            head_cnt <= 3'd0;
+        end
+        else if(jpeg_head_data_valid)begin
+            head_cnt <= head_cnt + 3'd1;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    // head_data <= {head_data[55:0], jpeg_head_data};
+    head_data <= {jpeg_head_data, head_data[63:8]};
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        head_valid <= 1'b0;
+        head_last  <= 1'b0;
+    end
+    else begin
+        head_valid <= jpeg_head_data_valid & (&head_cnt);
+        head_last  <= jpeg_head_data_last;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_data_temp_bits <=  5'd0;
+        huffman_data_temp      <= 28'd0;
+    end
+    else if(huffman_s_data_valid)begin
+        huffman_data_temp_bits <= huffman_s_len + huffman_s_bits;
+        huffman_data_temp      <= (huffman_s_code << huffman_s_bits) | huffman_s_data;
+    end
+    else begin
+        huffman_data_temp_bits <=  5'd0;
+        huffman_data_temp      <= 28'd0;
+    end   
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_64 <= 64'd0;
+    end
+    else begin
+        huffman_64 <= (huffman_64 << huffman_data_temp_bits) | huffman_data_temp;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_64_bits <= 7'd0;
+    end
+    else if(jpeg_start)begin
+        huffman_64_bits <= 7'd0;
+    end
+    else if(huffman_64_bits >= 7'd32)begin
+        huffman_64_bits <= huffman_64_bits - 7'd32 + huffman_data_temp_bits;
+    end
+    else begin
+        huffman_64_bits <= huffman_64_bits + huffman_data_temp_bits;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_32 <= 32'd0;
+    end
+    else begin
+        if(huffman_s_frame_end_ff[2] && (huffman_64_bits < 7'd32))begin
+            huffman_32 <= huffman_64[31:0] << (7'd32 - huffman_64_bits);
+        end
+        else begin
+            huffman_32 <= huffman_64 >> (huffman_64_bits - 7'd32);
+        end        
+    end    
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_32_bits <= 6'd0;
+    end
+    else if(jpeg_start)begin
+        huffman_32_bits <= 6'd0;
+    end
+    else begin
+        if(huffman_s_frame_end_ff[2] && (huffman_64_bits < 7'd32))begin
+            huffman_32_bits <= 6'd32;
+        end
+        else if(huffman_64_bits >= 7'd32)begin
+            huffman_32_bits <= 6'd32;
+        end
+        else begin
+            huffman_32_bits <= 6'd0;
+        end
+    end
+end
+
+generate
+    for (i = 0; i < 4; i = i+1) begin : LOOP_PADDING
+        always @(posedge clk ) begin
+            if(rst)begin
+                huffman_32_padding[i] <= 16'd0;
+            end
+            else if(huffman_32[(i*8) +: 8] == 8'hFF)begin
+                huffman_32_padding[i] <= {huffman_32[(i*8) +: 8], 8'd0};
+            end
+            else begin
+                huffman_32_padding[i] <= {8'd0, huffman_32[(i*8) +: 8]};
+            end
+        end
+    end
+endgenerate
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_32_padding_bits[0] <= 5'd0;
+    end
+    else if(jpeg_start)begin
+        huffman_32_padding_bits[0] <= 5'd0;
+    end
+    else if(huffman_32_bits >= 6'd8)begin
+        if(huffman_32[7:0] == 8'hFF)begin
+            huffman_32_padding_bits[0] <= 5'd16;
+        end
+        else begin
+            huffman_32_padding_bits[0] <= 5'd8;
+        end
+    end
+    else begin
+        huffman_32_padding_bits[0] <= huffman_32_bits;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_32_padding_bits[1] <= 5'd0;
+    end
+    else if(jpeg_start)begin
+        huffman_32_padding_bits[1] <= 5'd0;
+    end
+    else if(huffman_32_bits > 6'd8)begin
+        if(huffman_32[15:8] == 8'hFF)begin
+            huffman_32_padding_bits[1] <= 5'd16;
+        end
+        else if(huffman_32_bits >= 6'd16)begin
+            huffman_32_padding_bits[1] <= 5'd8;
+        end
+        else begin
+            huffman_32_padding_bits[1] <= huffman_32_bits - 5'd8;
+        end
+    end
+    else begin
+        huffman_32_padding_bits[1] <= 5'd0;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_32_padding_bits[2] <= 5'd0;
+    end
+    else if(jpeg_start)begin
+        huffman_32_padding_bits[2] <= 5'd0;
+    end
+    else if(huffman_32_bits > 6'd16)begin
+        if(huffman_32[23:16] == 8'hFF)begin
+            huffman_32_padding_bits[2] <= 5'd16;
+        end
+        else if(huffman_32_bits >= 6'd24)begin
+            huffman_32_padding_bits[2] <= 5'd8;
+        end
+        else begin
+            huffman_32_padding_bits[2] <= huffman_32_bits - 5'd16;
+        end
+    end
+    else begin
+        huffman_32_padding_bits[2] <= 5'd0;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_32_padding_bits[3] <= 5'd0;
+    end
+    else if(jpeg_start)begin
+        huffman_32_padding_bits[3] <= 5'd0;
+    end
+    else if(huffman_32_bits > 6'd24)begin
+        if(huffman_32[31:24] == 8'hFF)begin
+            huffman_32_padding_bits[3] <= 5'd16;
+        end
+        else begin
+            huffman_32_padding_bits[3] <= huffman_32_bits - 5'd24;
+        end
+    end
+    else begin
+        huffman_32_padding_bits[3] <= 5'd0;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_64_p_t1 <= 32'd0;
+        huffman_64_p_t2 <= 32'd0;
+    end
+    else begin
+        huffman_64_p_t1 <= huffman_32_padding[0] | 
+                   (huffman_32_padding[1] << huffman_32_padding_bits[0]);
+        huffman_64_p_t2 <= huffman_32_padding[2] |
+                   (huffman_32_padding[3] << huffman_32_padding_bits[2]) ;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_64_p_bits_t1 <= 6'd0;
+        huffman_64_p_bits_t2 <= 6'd0;
+    end
+    else begin
+        huffman_64_p_bits_t1 <= huffman_32_padding_bits[0] + huffman_32_padding_bits[1];
+        huffman_64_p_bits_t2 <= huffman_32_padding_bits[2] + huffman_32_padding_bits[3];
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_64_p <= 64'd0;
+    end
+    else begin
+        huffman_64_p <= huffman_64_p_t1 | 
+                   (huffman_64_p_t2 << huffman_64_p_bits_t1);
+    end    
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_64_p_bits <= 7'd0;
+    end
+    else begin
+        huffman_64_p_bits <= huffman_64_p_bits_t1 + huffman_64_p_bits_t2;
+    end   
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_128 <= 128'd0;
+    end
+    else begin
+        huffman_128 <= (huffman_128 << huffman_64_p_bits) | huffman_64_p;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_128_bits <= 8'd0;
+    end
+    else if(jpeg_start)begin
+        huffman_128_bits <= 8'd0;
+    end
+    else if(huffman_128_bits >= 8'd64)begin
+        huffman_128_bits <= huffman_128_bits + huffman_64_p_bits - 8'd64;
+    end
+    else begin
+        huffman_128_bits <= huffman_128_bits + huffman_64_p_bits;
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_data <= 64'd0;
+    end
+    else begin
+        if(huffman_s_frame_end_ff[7] && (huffman_128_bits == 8'd32))begin
+            huffman_data <= {huffman_128[31:0], 32'd0};
+        end
+        else if(huffman_s_frame_end_ff[8] && (huffman_128_bits > 8'd0))begin
+            huffman_data <= huffman_128 << (8'd64 - huffman_128_bits);
+        end
+        else begin
+            huffman_data <= huffman_128 >> (huffman_128_bits - 8'd64);
+        end       
+    end   
+end
+
+assign huffman_data_reverse = {huffman_data[7:0], huffman_data[15:8], huffman_data[23:16], huffman_data[31:24], huffman_data[39:32], huffman_data[47:40], huffman_data[55:48], huffman_data[63:56]};
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_data_valid_1 <= 1'b0;
+    end
+    else begin
+        if((huffman_128_bits >= 8'd64) || (huffman_s_frame_end_ff[7] && (huffman_128_bits == 8'd32)) || (huffman_s_frame_end_ff[8] && (huffman_128_bits > 8'd0)))begin
+            huffman_data_valid_1 <= 1'b1;
+        end
+        else begin
+            huffman_data_valid_1 <= 1'b0;
+        end
+    end
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        huffman_s_frame_end_ff <= 11'd0;
+    end
+    else begin
+        huffman_s_frame_end_ff <= {huffman_s_frame_end_ff[9:0], huffman_s_frame_end & huffman_s_data_valid};
+    end
+end
+
+
+assign m_data       = head_valid                ? head_data    : 
+                      huffman_s_frame_end_ff[10] ? 64'hD9FF:
+                                                  huffman_data_reverse   ;
+assign m_data_keep  = 8'b1111_1111;
+assign m_data_valid = head_valid | huffman_data_valid_1 | huffman_s_frame_end_ff[10];
+assign m_data_last  = huffman_s_frame_end_ff[10];
+    
+endmodule
