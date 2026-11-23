@@ -111,10 +111,10 @@ always @(posedge clk ) begin
     end   
     div_lum_rdata_ff[1] <= div_lum_rdata_ff[0];
 end
-// reg [19:0] test_mem [921600 - 1:0];
+// reg [19:0] test_mem [2764800 - 1:0];
 // reg [31:0]  addr;
 // initial begin
-//     $readmemh("E:/isp/MATLAB_Jpeg_encoder_master/jpeg_gray/quant_data.txt", test_mem);
+//     $readmemh("E:/isp/MATLAB_Jpeg_encoder_master/quant_data.txt", test_mem);
 // end
 
 // always @(posedge clk ) begin
@@ -151,7 +151,7 @@ always @(posedge clk ) begin
     end
     else begin
         if(s_data_valid_ff[5])begin
-            if(s_data_last_ff[5])begin
+            if(first_flag)begin
                 zero_cnt <= 6'd0;
             end
             else begin
@@ -199,12 +199,12 @@ always @(posedge clk ) begin
     end
     else begin
         valid <= s_data_valid_ff[5] && ((round_data != 12'd0) || s_data_last_ff[5] || first_flag); 
-        valid_zero_last <= s_data_valid_ff[5] & (round_data[11:0] == 12'd0) & s_data_last_ff[5];
+        valid_zero_last <= s_data_valid_ff[5] & (round_data[11:0] != 12'd0) & (!first_flag);
     end
 end
 
 assign m_data       = round_data_ff     ;
-assign m_zero_cnt   = valid_zero_last ? zero_cnt_ff_add1 : zero_cnt_ff;
+assign m_zero_cnt   = valid_zero_last ? zero_cnt_ff : zero_cnt          ;
 assign m_data_valid = valid             ;
 assign m_data_last  = s_data_last_ff [6];
     
