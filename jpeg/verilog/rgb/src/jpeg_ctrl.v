@@ -66,17 +66,34 @@ reg [15:0]   img_h_num;
 reg [15:0]   img_w_num;
 reg [15:0]   img_h_cnt;
 reg [15:0]   img_w_cnt;
+reg [1:0]    channel_cnt;
 
 always @(posedge clk ) begin
     img_h_num <= cfg_img_h[15:3] + (|cfg_img_h[2:0]);
     img_w_num <= cfg_img_w[15:3] + (|cfg_img_w[2:0]);
+end
+
+always @(posedge clk ) begin
+    if(rst)begin
+        channel_cnt <= 2'd0;
+    end
+    else begin
+        if(huffman_s_data_valid & huffman_s_data_last)begin
+            if(channel_cnt == 2'd2)begin
+                channel_cnt <= 2'd0;
+            end
+            else begin
+                channel_cnt <= channel_cnt + 2'd1;
+            end
+        end
+    end
 end
 always @(posedge clk ) begin
     if(rst)begin
         img_w_cnt <= 16'd1;
     end
     else begin
-        if(huffman_s_data_valid & huffman_s_data_last)begin
+        if(huffman_s_data_valid & huffman_s_data_last & (channel_cnt == 2'd2))begin
             if(img_w_cnt == img_w_num)begin
                 img_w_cnt <= 16'd1;
             end
@@ -93,7 +110,7 @@ always @(posedge clk ) begin
     end
     else begin
         if(huffman_s_data_valid & huffman_s_data_last)begin
-            if(img_w_cnt == img_w_num)begin
+            if((img_w_cnt == img_w_num) && (channel_cnt == 2'd2))begin
                 if(img_h_num == img_h_cnt)begin
                     img_h_cnt <= 16'd1;
                 end
@@ -110,7 +127,7 @@ always @(posedge clk ) begin
         huffman_s_frame_end_flag <= 1'b0;
     end
     else begin
-        huffman_s_frame_end_flag <= (img_h_cnt == img_h_num) && (img_w_cnt == img_w_num);
+        huffman_s_frame_end_flag <= (img_h_cnt == img_h_num) && (img_w_cnt == img_w_num) && (channel_cnt == 2'd2);
     end
 end
 
